@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Life of a Hoodie in a Store</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  :root {
+    --bg: #f4f7fb;
+    --panel: #ffffff;
+    --ink: #172233;
+    --muted: #5c6878;
+    --line: #d7e0ea;
+    --teal: #16806f;
+    --blue: #2f80ed;
+    --amber: #c47a15;
+    --red: #bd4332;
+    --green: #198754;
+    --purple: #7057d4;
+    --shadow: 0 16px 34px rgba(23, 34, 51, 0.12);
+  }
+
+  body {
+    min-height: 100vh;
+    font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(180deg, #f8fafc 0%, #edf3f7 100%);
+    color: var(--ink);
+  }
+
+  button {
+    font: inherit;
+  }
+
+  .app {
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    padding: 24px 18px 34px;
+  }
+
+  header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .kicker {
+    color: var(--teal);
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-size: clamp(1.55rem, 4vw, 2.45rem);
+    line-height: 1.06;
+    letter-spacing: 0;
+  }
+
+  .header-note {
+    width: min(480px, 100%);
+    color: var(--muted);
+    font-size: 0.94rem;
+    line-height: 1.45;
+  }
+
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+    gap: 14px;
+    align-items: start;
+  }
+
+  .story-panel,
+  .accounting-panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+  }
+
+  .story-panel {
+    min-height: 670px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    overflow: hidden;
+  }
+
+  .story-band {
+    padding: 18px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(90deg, #ffffff 0%, #f3fbf8 100%);
+  }
+
+  .step-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--teal);
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+
+  .step-count::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--teal);
+    box-shadow: 0 0 0 5px rgba(22, 128, 111, 0.12);
+  }
+
+  #storyTitle {
+    font-size: 1.24rem;
+    line-height: 1.2;
+    margin-bottom: 7px;
+  }
+
+  #storyText {
+    min-height: 44px;
+    color: var(--muted);
+    font-size: 0.94rem;
+    line-height: 1.48;
+    max-width: 720px;
+  }
+
+  .scene {
+    position: relative;
+    min-height: 390px;
+    background:
+      linear-gradient(180deg, #e8f2fb 0%, #f7fbff 55%, #e3ebdf 56%, #dbe5d9 100%);
+    overflow: hidden;
+  }
+
+  .road {
+    position: absolute;
+    left: 7%;
+    right: 7%;
+    bottom: 112px;
+    height: 12px;
+    border-radius: 999px;
+    background: rgba(23, 34, 51, 0.16);
+  }
+
+  .place {
+    position: absolute;
+    bottom: 82px;
+    width: 164px;
+    min-height: 136px;
+    display: grid;
+    justify-items: center;
+    align-content: end;
+    gap: 8px;
+  }
+
+  .supplier {
+    left: 4%;
+  }
+
+  .store {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .customer {
+    right: 4%;
+  }
+
+  .place-label {
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 6px 10px;
+    font-size: 0.76rem;
+    font-weight: 900;
+    color: var(--muted);
+  }
+
+  .warehouse,
+  .shop,
+  .person {
+    position: relative;
+    width: 132px;
+    height: 94px;
+  }
+
+  .warehouse {
+    border: 3px solid var(--ink);
+    border-radius: 8px 8px 4px 4px;
+    background: #c9d6e4;
+  }
+
+  .warehouse::before {
+    content: "";
+    position: absolute;
+    left: -4px;
+    right: -4px;
+    top: -26px;
+    height: 28px;
+    border: 3px solid var(--ink);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    background: #7f94aa;
+  }
+
+  .shop {
+    border: 3px solid var(--ink);
+    border-radius: 8px 8px 4px 4px;
+    background: #ffffff;
+    overflow: hidden;
+  }
+
+  .shop::before {
+    content: "STORE";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    background: var(--teal);
+    color: #fff;
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+  }
+
+  .shelf {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 20px;
+    height: 12px;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: #d9b478;
+  }
+
+  .person::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 42px;
+    height: 42px;
+    transform: translateX(-50%);
+    border: 3px solid var(--ink);
+    border-radius: 50%;
+    background: #f2c198;
+  }
+
+  .person::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 43px;
+    width: 76px;
+    height: 58px;
+    transform: translateX(-50%);
+    border: 3px solid var(--ink);
+    border-radius: 18px 18px 8px 8px;
+    background: var(--blue);
+  }
+
+  .bag {
+    position: absolute;
+    right: 0;
+    bottom: 3px;
+    width: 46px;
+    height: 52px;
+    border: 3px solid var(--ink);
+    border-radius: 8px;
+    background: #fff3c4;
+  }
+
+  .bag::before {
+    content: "";
+    position: absolute;
+    left: 12px;
+    top: -14px;
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--ink);
+    border-bottom: none;
+    border-radius: 999px 999px 0 0;
+  }
+
+  .hoodie {
+    position: absolute;
+    left: 10%;
+    top: 124px;
+    width: 94px;
+    height: 98px;
+    transition: left 520ms ease, top 520ms ease, transform 520ms ease;
+    z-index: 5;
+    filter: drop-shadow(0 12px 12px rgba(23, 34, 51, 0.18));
+  }
+
+  .hoodie-body {
+    position: absolute;
+    left: 25px;
+    top: 30px;
+    width: 44px;
+    height: 62px;
+    border: 3px solid var(--ink);
+    border-radius: 14px 14px 8px 8px;
+    background: var(--purple);
+  }
+
+  .hoodie-body::before {
+    content: "";
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 12px;
+    height: 14px;
+    border: 2px solid var(--ink);
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .hood {
+    position: absolute;
+    left: 23px;
+    top: 2px;
+    width: 48px;
+    height: 42px;
+    border: 3px solid var(--ink);
+    border-radius: 26px 26px 16px 16px;
+    background: var(--purple);
+  }
+
+  .sleeve {
+    position: absolute;
+    top: 38px;
+    width: 24px;
+    height: 48px;
+    border: 3px solid var(--ink);
+    background: var(--purple);
+    border-radius: 12px;
+  }
+
+  .sleeve.left {
+    left: 7px;
+    transform: rotate(13deg);
+  }
+
+  .sleeve.right {
+    right: 7px;
+    transform: rotate(-13deg);
+  }
+
+  .price-tag {
+    position: absolute;
+    right: -10px;
+    top: 22px;
+    width: 38px;
+    min-height: 28px;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    background: #fff;
+    display: grid;
+    place-items: center;
+    color: var(--teal);
+    font-size: 0.72rem;
+    font-weight: 900;
+  }
+
+  .scene.step-0 .hoodie {
+    left: 10%;
+    top: 124px;
+  }
+
+  .scene.step-1 .hoodie {
+    left: calc(50% - 47px);
+    top: 128px;
+  }
+
+  .scene.step-2 .hoodie,
+  .scene.step-3 .hoodie,
+  .scene.step-4 .hoodie {
+    left: calc(88% - 94px);
+    top: 132px;
+    transform: rotate(4deg);
+  }
+
+  .motion-line {
+    position: absolute;
+    left: 20%;
+    right: 20%;
+    top: 92px;
+    height: 5px;
+    border-radius: 999px;
+    background: repeating-linear-gradient(90deg, var(--teal) 0, var(--teal) 24px, transparent 24px, transparent 38px);
+    opacity: 0.55;
+    animation: dashMove 1.2s linear infinite;
+  }
+
+  .cash-bubble,
+  .cost-bubble {
+    position: absolute;
+    min-width: 84px;
+    border-radius: 999px;
+    padding: 9px 12px;
+    color: #fff;
+    font-weight: 900;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 220ms ease, transform 220ms ease;
+    z-index: 8;
+  }
+
+  .cash-bubble {
+    right: 23%;
+    top: 76px;
+    background: var(--green);
+  }
+
+  .cost-bubble {
+    left: 49%;
+    top: 236px;
+    background: var(--amber);
+  }
+
+  .scene.step-2 .cash-bubble,
+  .scene.step-4 .cash-bubble,
+  .scene.step-3 .cost-bubble,
+  .scene.step-4 .cost-bubble {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .compare-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 14px;
+    border-top: 1px solid var(--line);
+    background: #fff;
+  }
+
+  .compare-card {
+    min-height: 110px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #f9fbfd;
+    padding: 13px;
+    display: grid;
+    gap: 7px;
+    align-content: start;
+  }
+
+  .compare-title {
+    font-size: 0.76rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .compare-main {
+    font-size: 1.04rem;
+    line-height: 1.22;
+    font-weight: 900;
+  }
+
+  .compare-note {
+    color: var(--muted);
+    font-size: 0.84rem;
+    line-height: 1.35;
+    font-weight: 750;
+  }
+
+  .accounting-panel {
+    min-height: 670px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .panel-title h2 {
+    font-size: 1.02rem;
+    line-height: 1.2;
+  }
+
+  .active-pill {
+    border-radius: 999px;
+    background: rgba(47, 128, 237, 0.1);
+    border: 1px solid rgba(47, 128, 237, 0.35);
+    color: var(--blue);
+    padding: 7px 10px;
+    font-size: 0.74rem;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  .tab-instruction {
+    color: var(--ink);
+    font-size: 0.86rem;
+    font-weight: 900;
+    line-height: 1.25;
+  }
+
+  .step-tabs {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .step-tab {
+    min-height: 58px;
+    border: 2px solid #9ab4d4;
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--ink);
+    padding: 9px 11px;
+    cursor: pointer;
+    text-align: left;
+    font-weight: 900;
+    line-height: 1.16;
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 16px rgba(23, 34, 51, 0.08);
+    transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 120ms ease;
+  }
+
+  .step-tab:hover {
+    transform: translateY(-1px);
+    border-color: var(--teal);
+  }
+
+  .step-tab.active {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(22, 128, 111, 0.24);
+  }
+
+  .tab-number {
+    width: 38px;
+    height: 32px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: var(--blue);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 900;
+  }
+
+  .step-tab.active .tab-number {
+    background: #fff;
+    color: var(--teal);
+  }
+
+  .tab-copy {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .tab-main {
+    font-size: 0.88rem;
+    overflow-wrap: anywhere;
+  }
+
+  .tab-sub {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+  }
+
+  .step-tab.active .tab-sub {
+    color: rgba(255, 255, 255, 0.86);
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 104px minmax(150px, 1fr) 88px;
+    gap: 8px;
+  }
+
+  .btn {
+    min-height: 46px;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    padding: 10px 12px;
+    font-size: 0.88rem;
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .btn:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+  }
+
+  .btn-muted {
+    background: #6b7788;
+  }
+
+  .btn-main {
+    background: var(--teal);
+  }
+
+  .btn-reset {
+    background: var(--amber);
+  }
+
+  .focus-card,
+  .example-card,
+  .takeaway-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #f9fbfd;
+    padding: 14px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .focus-kicker,
+  .example-kicker {
+    color: var(--teal);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .focus-title {
+    font-size: 1.18rem;
+    line-height: 1.2;
+    font-weight: 900;
+  }
+
+  .focus-text,
+  .takeaway-text {
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.42;
+    font-weight: 750;
+  }
+
+  .journal-entry {
+    display: grid;
+    gap: 7px;
+  }
+
+  .journal-line {
+    min-height: 40px;
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) 68px 68px;
+    gap: 7px;
+    align-items: center;
+    border: 1px solid #e1e8f0;
+    border-radius: 8px;
+    background: #fff;
+    padding: 8px 9px;
+    font-size: 0.84rem;
+    font-weight: 900;
+  }
+
+  .journal-line.header {
+    min-height: 31px;
+    background: #edf4fb;
+    color: var(--muted);
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .journal-account.credit-account {
+    padding-left: 18px;
+  }
+
+  .journal-debit,
+  .journal-credit {
+    text-align: right;
+    font-weight: 900;
+  }
+
+  .journal-debit {
+    color: var(--blue);
+  }
+
+  .journal-credit {
+    color: var(--teal);
+  }
+
+  .callout {
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.86rem;
+    font-weight: 900;
+    line-height: 1.35;
+  }
+
+  .callout.sale {
+    color: var(--green);
+    background: #eef8f5;
+    border-left: 4px solid var(--green);
+  }
+
+  .callout.cost {
+    color: var(--amber);
+    background: #fff8ec;
+    border-left: 4px solid var(--amber);
+  }
+
+  .summary-grid {
+    display: grid;
+    gap: 9px;
+  }
+
+  .summary-row {
+    min-height: 44px;
+    display: grid;
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+    border: 1px solid #e1e8f0;
+    border-radius: 8px;
+    background: #fff;
+    padding: 9px 10px;
+  }
+
+  .summary-label {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .summary-value {
+    font-weight: 900;
+    line-height: 1.25;
+  }
+
+  @keyframes dashMove {
+    from { background-position: 0 0; }
+    to { background-position: 76px 0; }
+  }
+
+  @media (max-width: 980px) {
+    .stage {
+      grid-template-columns: 1fr;
+    }
+
+    .story-panel,
+    .accounting-panel {
+      min-height: 0;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .app {
+      padding: 18px 10px 28px;
+    }
+
+    .place {
+      width: 120px;
+    }
+
+    .warehouse,
+    .shop,
+    .person {
+      width: 100px;
+    }
+
+    .compare-strip {
+      grid-template-columns: 1fr;
+    }
+
+    .controls {
+      grid-template-columns: 1fr;
+    }
+
+    .journal-line {
+      grid-template-columns: 46px minmax(0, 1fr) 58px 58px;
+      font-size: 0.78rem;
+    }
+  }
+</style>
+</head>
+<body>
+<main class="app">
+  <header>
+    <div>
+      <div class="kicker">Ch 5 · Merchandising Operations</div>
+      <h1>Life of a Hoodie in a Store</h1>
+    </div>
+    <p class="header-note">A merchandising company buys goods, holds them as inventory, sells them to customers, and records the cost of the goods sold.</p>
+  </header>
+
+  <section class="stage">
+    <section class="story-panel" aria-label="Hoodie merchandising story">
+      <div class="story-band">
+        <div class="step-count" id="stepCount">Step 1 of 5</div>
+        <h2 id="storyTitle">A store sells goods, not just services</h2>
+        <p id="storyText">A service company sells work. A merchandising company buys goods, keeps them as inventory, and later sells them to customers.</p>
+      </div>
+
+      <div class="scene step-0" id="scene">
+        <div class="motion-line"></div>
+        <div class="road"></div>
+
+        <div class="place supplier">
+          <div class="warehouse"></div>
+          <div class="place-label">Supplier</div>
+        </div>
+
+        <div class="place store">
+          <div class="shop"><div class="shelf"></div></div>
+          <div class="place-label">Store inventory</div>
+        </div>
+
+        <div class="place customer">
+          <div class="person"><div class="bag"></div></div>
+          <div class="place-label">Customer</div>
+        </div>
+
+        <div class="hoodie" aria-hidden="true">
+          <div class="hood"></div>
+          <div class="sleeve left"></div>
+          <div class="sleeve right"></div>
+          <div class="hoodie-body"></div>
+          <div class="price-tag">$60</div>
+        </div>
+
+        <div class="cash-bubble">Sale $60</div>
+        <div class="cost-bubble">Cost $35</div>
+      </div>
+
+      <div class="compare-strip">
+        <div class="compare-card">
+          <div class="compare-title">Service company</div>
+          <div class="compare-main">Sells services</div>
+          <div class="compare-note">No inventory is sold, so there is no Cost of Goods Sold entry for the service.</div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-title">Merchandising company</div>
+          <div class="compare-main">Sells inventory</div>
+          <div class="compare-note">The sale has revenue and cost: Inventory leaves the store and becomes Cost of Goods Sold.</div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="accounting-panel">
+      <div class="panel-title">
+        <h2>Perpetual Inventory Check</h2>
+        <span class="active-pill" id="activePill">Step 1 of 5</span>
+      </div>
+
+      <div>
+        <div class="tab-instruction">Click through each step. When the hoodie sells, watch carefully — a merchandiser records <b>two</b> journal entries, not one. That's the key difference from a service business.</div>
+      </div>
+      <div class="step-tabs" id="stepTabs"></div>
+
+      <div class="controls">
+        <button class="btn btn-muted" type="button" id="prevBtn">Previous</button>
+        <button class="btn btn-main" type="button" id="nextBtn">Next Step</button>
+        <button class="btn btn-reset" type="button" id="resetBtn">Reset</button>
+      </div>
+
+      <div class="focus-card">
+        <div class="focus-kicker" id="focusKicker">Big idea</div>
+        <div class="focus-title" id="focusTitle">Merchandising companies have inventory</div>
+        <p class="focus-text" id="focusText">A merchandiser buys goods for resale. Those goods are Inventory until they are sold.</p>
+      </div>
+
+      <div class="example-card" id="exampleCard"></div>
+
+      <div class="takeaway-card">
+        <div class="example-kicker">Student takeaway</div>
+        <p class="takeaway-text" id="takeawayText">When a merchandiser sells inventory under the perpetual system, the accounting records both the sales price and the cost of the item sold.</p>
+      </div>
+    </aside>
+  </section>
+</main>
+
+<script>
+  const steps = [
+    {
+      title: "A store sells goods, not just services",
+      tab: "Big idea",
+      tabSub: "Service vs merchandiser",
+      kicker: "Big idea",
+      focusTitle: "Merchandising companies have inventory",
+      text: "A service company sells work. A merchandising company buys goods, keeps them as inventory, and later sells them to customers.",
+      focusText: "A merchandiser buys goods for resale. Those goods are Inventory until they are sold.",
+      takeaway: "Inventory is what makes merchandising operations different from service operations.",
+      sceneClass: "step-0",
+      format: "summary",
+      summary: [
+        ["Service company", "Earns revenue by providing services."],
+        ["Merchandising company", "Earns revenue by selling goods from Inventory."],
+        ["New accounts", "Inventory and Cost of Goods Sold become central accounts."]
+      ]
+    },
+    {
+      title: "The hoodie enters the store",
+      tab: "Buy hoodie",
+      tabSub: "Inventory begins",
+      kicker: "Purchase inventory",
+      focusTitle: "The hoodie is an asset before it is sold",
+      text: "The store buys the hoodie from a supplier for $35. Until the hoodie is sold, the cost sits in Inventory.",
+      focusText: "Buying goods for resale creates Inventory, an asset. This is different from buying supplies to use inside the business.",
+      takeaway: "Before the sale, the hoodie is not an expense. It is Inventory.",
+      sceneClass: "step-1",
+      format: "journal",
+      calloutClass: "sale",
+      callout: "The store bought one hoodie for resale. The $35 cost goes into Inventory.",
+      journalRows: [
+        { date: "May 4", account: "Inventory", debit: "$35", credit: "" },
+        { date: "", account: "Accounts Payable", debit: "", credit: "$35", creditLine: true }
+      ],
+      explanation: "Purchased one hoodie on account."
+    },
+    {
+      title: "Entry 1: record the sale",
+      tab: "Record sale",
+      tabSub: "Sales price $60",
+      kicker: "Sale entry",
+      focusTitle: "First, record what the customer pays",
+      text: "The customer buys the hoodie for $60 cash. The first entry records the sales price and revenue.",
+      focusText: "This entry records the selling price. It does not record the cost of the hoodie yet.",
+      takeaway: "The sale entry records revenue at the sales price: $60.",
+      sceneClass: "step-2",
+      format: "journal",
+      calloutClass: "sale",
+      callout: "Entry 1 uses the sales price: the customer pays $60.",
+      journalRows: [
+        { date: "May 12", account: "Cash", debit: "$60", credit: "" },
+        { date: "", account: "Sales Revenue", debit: "", credit: "$60", creditLine: true }
+      ],
+      explanation: "Recorded the sale of the hoodie for cash."
+    },
+    {
+      title: "Entry 2: record the cost",
+      tab: "Record cost",
+      tabSub: "COGS $35",
+      kicker: "Cost entry",
+      focusTitle: "Second, record the cost of the hoodie sold",
+      text: "Under a perpetual inventory system, the store immediately records the cost of the hoodie that left Inventory.",
+      focusText: "This entry uses the store's cost, not the sales price. Cost of Goods Sold increases and Inventory decreases.",
+      takeaway: "The cost entry records the cost of the item sold: $35.",
+      sceneClass: "step-3",
+      format: "journal",
+      calloutClass: "cost",
+      callout: "Entry 2 uses the cost: the hoodie cost the store $35.",
+      journalRows: [
+        { date: "May 12", account: "Cost of Goods Sold", debit: "$35", credit: "" },
+        { date: "", account: "Inventory", debit: "", credit: "$35", creditLine: true }
+      ],
+      explanation: "Recorded the cost of the hoodie sold and removed it from Inventory."
+    },
+    {
+      title: "One sale, two accounting effects",
+      tab: "Wrap-up",
+      tabSub: "Revenue and cost",
+      kicker: "Conclusion",
+      focusTitle: "A merchandiser records both revenue and cost",
+      text: "The hoodie has moved from supplier to store to customer. The accounting records both the $60 sale and the $35 cost.",
+      focusText: "A service company usually records service revenue. A merchandising company records sales revenue and Cost of Goods Sold.",
+      takeaway: "Perpetual inventory means Inventory is updated every time goods are sold.",
+      sceneClass: "step-4",
+      format: "summary",
+      summary: [
+        ["Entry 1", "Dr Cash $60; Cr Sales Revenue $60."],
+        ["Entry 2", "Dr Cost of Goods Sold $35; Cr Inventory $35."],
+        ["Gross profit", "Sales $60 - Cost $35 = Gross profit $25."]
+      ]
+    }
+  ];
+
+  let activeIndex = 0;
+
+  const el = {
+    stepCount: document.getElementById("stepCount"),
+    storyTitle: document.getElementById("storyTitle"),
+    storyText: document.getElementById("storyText"),
+    scene: document.getElementById("scene"),
+    activePill: document.getElementById("activePill"),
+    stepTabs: document.getElementById("stepTabs"),
+    focusKicker: document.getElementById("focusKicker"),
+    focusTitle: document.getElementById("focusTitle"),
+    focusText: document.getElementById("focusText"),
+    exampleCard: document.getElementById("exampleCard"),
+    takeawayText: document.getElementById("takeawayText"),
+    prevBtn: document.getElementById("prevBtn"),
+    nextBtn: document.getElementById("nextBtn"),
+    resetBtn: document.getElementById("resetBtn")
+  };
+
+  function renderTabs() {
+    el.stepTabs.innerHTML = "";
+    steps.forEach((step, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "step-tab";
+      button.classList.toggle("active", index === activeIndex);
+      button.setAttribute("aria-pressed", index === activeIndex ? "true" : "false");
+      button.innerHTML = `
+        <span class="tab-number">${index + 1}</span>
+        <span class="tab-copy">
+          <span class="tab-main">${step.tab}</span>
+          <span class="tab-sub">${step.tabSub}</span>
+        </span>
+      `;
+      button.addEventListener("click", () => {
+        activeIndex = index;
+        render();
+      });
+      el.stepTabs.appendChild(button);
+    });
+  }
+
+  function renderJournal(step) {
+    const rows = step.journalRows.map((row) => `
+      <div class="journal-line">
+        <div>${row.date}</div>
+        <div class="journal-account${row.creditLine ? " credit-account" : ""}">${row.account}</div>
+        <div class="journal-debit">${row.debit}</div>
+        <div class="journal-credit">${row.credit}</div>
+      </div>
+    `).join("");
+
+    el.exampleCard.innerHTML = `
+      <div class="example-kicker">Matching journal entry</div>
+      <div class="callout ${step.calloutClass}">${step.callout}</div>
+      <div class="journal-entry">
+        <div class="journal-line header">
+          <div>Date</div>
+          <div>Account Titles and Explanation</div>
+          <div>Debit</div>
+          <div>Credit</div>
+        </div>
+        ${rows}
+      </div>
+      <p class="focus-text">${step.explanation}</p>
+    `;
+  }
+
+  function renderSummary(step) {
+    const rows = step.summary.map((row) => `
+      <div class="summary-row">
+        <div class="summary-label">${row[0]}</div>
+        <div class="summary-value">${row[1]}</div>
+      </div>
+    `).join("");
+
+    el.exampleCard.innerHTML = `
+      <div class="example-kicker">What to remember</div>
+      <div class="summary-grid">${rows}</div>
+    `;
+  }
+
+  function renderExample(step) {
+    if (step.format === "journal") {
+      renderJournal(step);
+      return;
+    }
+
+    renderSummary(step);
+  }
+
+  function render() {
+    const step = steps[activeIndex];
+    el.stepCount.textContent = "Step " + (activeIndex + 1) + " of " + steps.length;
+    el.storyTitle.textContent = step.title;
+    el.storyText.textContent = step.text;
+    el.scene.className = "scene " + step.sceneClass;
+    el.activePill.textContent = "Step " + (activeIndex + 1) + " of " + steps.length;
+    el.focusKicker.textContent = step.kicker;
+    el.focusTitle.textContent = step.focusTitle;
+    el.focusText.textContent = step.focusText;
+    el.takeawayText.textContent = step.takeaway;
+    el.prevBtn.disabled = activeIndex === 0;
+    el.nextBtn.textContent = activeIndex === steps.length - 1 ? "Start Again" : "Next Step";
+    renderTabs();
+    renderExample(step);
+  }
+
+  function goPrevious() {
+    activeIndex = Math.max(0, activeIndex - 1);
+    render();
+  }
+
+  function goNext() {
+    activeIndex = activeIndex === steps.length - 1 ? 0 : activeIndex + 1;
+    render();
+  }
+
+  el.prevBtn.addEventListener("click", goPrevious);
+  el.nextBtn.addEventListener("click", goNext);
+  el.resetBtn.addEventListener("click", () => {
+    activeIndex = 0;
+    render();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    const tag = event.target.tagName;
+    const isTyping = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+
+    if (isTyping || event.altKey || event.ctrlKey || event.metaKey) {
+      return;
+    }
+
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      goPrevious();
+    }
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      goNext();
+    }
+  });
+
+  render();
+</script>
+<footer style="text-align:center;color:#5c6878;font-size:0.82rem;padding:18px 12px 10px;border-top:1px solid #d7e0ea;margin-top:24px;">Reference: Horngren, <i>Financial &amp; Managerial Accounting</i> (7th ed.) — Ch&nbsp;5 · Merchandising Operations</footer>
+</body>
+</html>

@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Who Owns the Company?</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  :root {
+    --panel: #ffffff;
+    --ink: #172233;
+    --muted: #5c6878;
+    --line: #d7e0ea;
+    --teal: #16806f;
+    --blue: #2f80ed;
+    --amber: #c47a15;
+    --red: #bd4332;
+    --green: #198754;
+    --purple: #7057d4;
+    --shadow: 0 16px 34px rgba(23, 34, 51, 0.12);
+  }
+
+  body {
+    min-height: 100vh;
+    font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(180deg, #f8fafc 0%, #edf3f7 100%);
+    color: var(--ink);
+  }
+
+  button {
+    font: inherit;
+  }
+
+  .app {
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    padding: 24px 18px 34px;
+  }
+
+  header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .kicker {
+    color: var(--teal);
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-size: clamp(1.55rem, 4vw, 2.45rem);
+    line-height: 1.06;
+    letter-spacing: 0;
+  }
+
+  .header-note {
+    width: min(520px, 100%);
+    color: var(--muted);
+    font-size: 0.94rem;
+    line-height: 1.45;
+  }
+
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+    gap: 14px;
+    align-items: start;
+  }
+
+  .story-panel,
+  .accounting-panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+  }
+
+  .story-panel {
+    min-height: 710px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    overflow: hidden;
+  }
+
+  .story-band {
+    padding: 18px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(90deg, #ffffff 0%, #f3fbf8 100%);
+  }
+
+  .step-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--teal);
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+
+  .step-count::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--teal);
+    box-shadow: 0 0 0 5px rgba(22, 128, 111, 0.12);
+  }
+
+  #storyTitle {
+    font-size: 1.24rem;
+    line-height: 1.2;
+    margin-bottom: 7px;
+  }
+
+  #storyText {
+    min-height: 44px;
+    color: var(--muted);
+    font-size: 0.94rem;
+    line-height: 1.48;
+    max-width: 720px;
+  }
+
+  .equity-scene {
+    position: relative;
+    min-height: 440px;
+    background:
+      linear-gradient(180deg, #e8f2fb 0%, #f8fbff 56%, #e2eadf 57%, #dae4d9 100%);
+    overflow: hidden;
+  }
+
+  .company-card {
+    position: absolute;
+    left: 7%;
+    top: 36px;
+    width: 172px;
+    min-height: 126px;
+    border: 3px solid var(--ink);
+    border-radius: 8px;
+    background: #ffffff;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 6px;
+    z-index: 7;
+    box-shadow: 0 12px 20px rgba(23, 34, 51, 0.13);
+  }
+
+  .company-label {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .company-name {
+    font-size: 1.14rem;
+    font-weight: 900;
+  }
+
+  .cash-chip {
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    background: #f0d67a;
+    color: var(--green);
+    padding: 8px 12px;
+    font-weight: 900;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 260ms ease, transform 260ms ease;
+  }
+
+  .owner-area {
+    position: absolute;
+    right: 6%;
+    top: 34px;
+    width: 252px;
+    min-height: 174px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.92);
+    padding: 12px;
+    display: grid;
+    gap: 8px;
+    z-index: 7;
+  }
+
+  .owner-title {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .ticket-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 7px;
+  }
+
+  .ticket {
+    min-height: 44px;
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    background: #f0f7ff;
+    display: grid;
+    place-items: center;
+    color: var(--blue);
+    font-weight: 900;
+    font-size: 0.75rem;
+    transition: opacity 240ms ease, transform 360ms ease, background 220ms ease, color 220ms ease;
+  }
+
+  .ticket.extra,
+  .ticket.split-extra {
+    opacity: 0;
+    transform: scale(0.72);
+  }
+
+  .ticket.treasury {
+    background: #fff3f0;
+    color: var(--red);
+  }
+
+  .pizza-wrap {
+    position: absolute;
+    left: calc(50% - 120px);
+    top: 150px;
+    width: 240px;
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    z-index: 5;
+  }
+
+  .pizza {
+    width: 188px;
+    height: 188px;
+    border: 4px solid var(--ink);
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at center, #fff7d1 0 26%, transparent 27%),
+      conic-gradient(
+        #f0d67a 0deg 45deg,
+        #f5b963 45deg 90deg,
+        #f0d67a 90deg 135deg,
+        #f5b963 135deg 180deg,
+        #f0d67a 180deg 225deg,
+        #f5b963 225deg 270deg,
+        #f0d67a 270deg 315deg,
+        #f5b963 315deg 360deg
+      );
+    box-shadow: 0 14px 22px rgba(23, 34, 51, 0.16);
+    transition: transform 420ms ease, filter 420ms ease;
+  }
+
+  .pizza-label {
+    min-width: 190px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    padding: 8px 12px;
+    text-align: center;
+    font-size: 0.82rem;
+    font-weight: 900;
+  }
+
+  .flow-chip {
+    position: absolute;
+    left: 36%;
+    top: 72px;
+    min-width: 120px;
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    background: #ffffff;
+    padding: 9px 12px;
+    text-align: center;
+    font-weight: 900;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 260ms ease, transform 260ms ease;
+    z-index: 8;
+    box-shadow: 0 10px 16px rgba(23, 34, 51, 0.14);
+  }
+
+  .dividend-cash {
+    position: absolute;
+    left: 39%;
+    bottom: 118px;
+    min-width: 144px;
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    background: #f0d67a;
+    color: var(--green);
+    padding: 10px 14px;
+    text-align: center;
+    font-weight: 900;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 260ms ease, transform 260ms ease;
+    z-index: 8;
+    box-shadow: 0 10px 16px rgba(23, 34, 51, 0.14);
+  }
+
+  .equity-note {
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    bottom: 18px;
+    min-height: 78px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 12px 14px;
+    display: grid;
+    gap: 6px;
+    z-index: 6;
+  }
+
+  .equity-kicker {
+    color: var(--teal);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .equity-text {
+    font-size: 1rem;
+    line-height: 1.3;
+    font-weight: 900;
+  }
+
+  .method-issue .cash-chip,
+  .method-issue .flow-chip {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .method-issue .ticket {
+    background: #e9f8f4;
+    color: var(--teal);
+  }
+
+  /* Once shares #7 and #8 are bought back as treasury in step 4,
+     they stay treasury for every step that follows. */
+  .method-treasury .ticket:nth-child(7),
+  .method-treasury .ticket:nth-child(8),
+  .method-cash-dividend .ticket:nth-child(7),
+  .method-cash-dividend .ticket:nth-child(8),
+  .method-stock-dividend .ticket:nth-child(7),
+  .method-stock-dividend .ticket:nth-child(8),
+  .method-stock-split .ticket:nth-child(7),
+  .method-stock-split .ticket:nth-child(8),
+  .method-summary .ticket:nth-child(7),
+  .method-summary .ticket:nth-child(8) {
+    background: #fff3f0;
+    color: var(--red);
+    border-color: var(--red);
+    transform: translateX(-92px) rotate(-4deg);
+  }
+
+  /* Preferred stock step — purple tickets indicate a different class of stock */
+  .method-preferred .ticket {
+    background: #f1ecff;
+    color: var(--purple);
+    border-color: var(--purple);
+  }
+
+  .method-preferred .flow-chip {
+    opacity: 1;
+    transform: translateY(0);
+    background: #f1ecff;
+    color: var(--purple);
+    border-color: var(--purple);
+  }
+
+  .method-preferred .cash-chip {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .method-treasury .flow-chip {
+    opacity: 1;
+    transform: translateY(0);
+    background: #fff3f0;
+    color: var(--red);
+  }
+
+  .method-cash-dividend .dividend-cash,
+  .method-cash-dividend .cash-chip {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .method-cash-dividend .pizza {
+    filter: saturate(0.82);
+  }
+
+  .method-stock-dividend .ticket.extra,
+  .method-stock-split .ticket.split-extra {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .method-stock-dividend .pizza,
+  .method-stock-split .pizza {
+    transform: scale(1.04);
+  }
+
+  .method-stock-split .ticket {
+    min-height: 34px;
+    font-size: 0.68rem;
+  }
+
+  .method-summary .ticket.extra,
+  .method-summary .ticket.split-extra {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .method-summary .pizza {
+    transform: scale(1.02);
+  }
+
+  .compare-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 14px;
+    border-top: 1px solid var(--line);
+    background: #fff;
+  }
+
+  .compare-card {
+    min-height: 112px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #f9fbfd;
+    padding: 13px;
+    display: grid;
+    gap: 7px;
+    align-content: start;
+  }
+
+  .compare-title {
+    font-size: 0.76rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .compare-main {
+    font-size: 1.02rem;
+    line-height: 1.22;
+    font-weight: 900;
+  }
+
+  .compare-note {
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.35;
+    font-weight: 750;
+  }
+
+  .accounting-panel {
+    min-height: 710px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .panel-title h2 {
+    font-size: 1.02rem;
+    line-height: 1.2;
+  }
+
+  .active-pill {
+    border-radius: 999px;
+    background: rgba(47, 128, 237, 0.1);
+    border: 1px solid rgba(47, 128, 237, 0.35);
+    color: var(--blue);
+    padding: 7px 10px;
+    font-size: 0.74rem;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  .tab-instruction {
+    color: var(--ink);
+    font-size: 0.86rem;
+    font-weight: 900;
+    line-height: 1.25;
+  }
+
+  .equity-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .equity-tab {
+    min-height: 62px;
+    border: 2px solid #9ab4d4;
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--ink);
+    padding: 9px 11px;
+    cursor: pointer;
+    text-align: left;
+    font-weight: 900;
+    line-height: 1.16;
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 16px rgba(23, 34, 51, 0.08);
+    transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 120ms ease;
+  }
+
+  .equity-tab:hover {
+    transform: translateY(-1px);
+    border-color: var(--teal);
+  }
+
+  .equity-tab.active {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(22, 128, 111, 0.24);
+  }
+
+  .tab-number {
+    width: 38px;
+    height: 32px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: var(--blue);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 900;
+  }
+
+  .equity-tab.active .tab-number {
+    background: #fff;
+    color: var(--teal);
+  }
+
+  .tab-copy {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .tab-main {
+    font-size: 0.88rem;
+    overflow-wrap: anywhere;
+  }
+
+  .tab-sub {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+  }
+
+  .equity-tab.active .tab-sub {
+    color: rgba(255, 255, 255, 0.86);
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 104px minmax(150px, 1fr) 88px;
+    gap: 8px;
+  }
+
+  .btn {
+    min-height: 46px;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    padding: 10px 12px;
+    font-size: 0.88rem;
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .btn:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+  }
+
+  .btn-muted {
+    background: #6b7788;
+  }
+
+  .btn-main {
+    background: var(--teal);
+  }
+
+  .btn-reset {
+    background: var(--amber);
+  }
+
+  .focus-card,
+  .example-card,
+  .quiz-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #f9fbfd;
+    padding: 14px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .focus-kicker,
+  .example-kicker,
+  .quiz-kicker {
+    color: var(--teal);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .focus-title {
+    font-size: 1.18rem;
+    line-height: 1.2;
+    font-weight: 900;
+  }
+
+  .focus-text {
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.42;
+    font-weight: 750;
+  }
+
+  .exam-clue {
+    border-left: 4px solid var(--amber);
+    background: #fff8ec;
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--ink);
+    font-size: 0.86rem;
+    line-height: 1.35;
+    font-weight: 850;
+  }
+
+  .example-title {
+    font-size: 1.04rem;
+    line-height: 1.25;
+    font-weight: 900;
+  }
+
+  .formula-box {
+    border: 1px solid #e1e8f0;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 10px 12px;
+    display: grid;
+    gap: 5px;
+  }
+
+  .formula-label {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .formula-text {
+    font-weight: 900;
+    line-height: 1.32;
+  }
+
+  .journal-table {
+    display: grid;
+    gap: 7px;
+  }
+
+  .journal-row {
+    min-height: 38px;
+    display: grid;
+    gap: 8px;
+    align-items: center;
+    border: 1px solid #e1e8f0;
+    border-radius: 8px;
+    background: #fff;
+    padding: 8px 10px;
+    font-weight: 900;
+  }
+
+  .journal-row.header {
+    min-height: 30px;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .credit-account {
+    padding-left: 24px;
+  }
+
+  .example-note {
+    color: var(--muted);
+    font-size: 0.86rem;
+    line-height: 1.35;
+    font-weight: 800;
+  }
+
+  .answer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .answer-btn {
+    min-height: 54px;
+    border: 2px solid #9ab4d4;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+    font-weight: 900;
+    font-size: 0.9rem;
+    line-height: 1.18;
+    padding: 8px;
+  }
+
+  .answer-btn:hover {
+    border-color: var(--teal);
+  }
+
+  .answer-btn.selected.correct {
+    border-color: var(--green);
+    background: #eef8f5;
+    color: var(--green);
+  }
+
+  .answer-btn.selected.incorrect {
+    border-color: var(--red);
+    background: #fff3f0;
+    color: var(--red);
+  }
+
+  .feedback {
+    min-height: 44px;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-weight: 850;
+    line-height: 1.35;
+  }
+
+  .feedback.correct {
+    background: #eef8f5;
+    border-color: rgba(25, 135, 84, 0.3);
+    color: var(--green);
+  }
+
+  .feedback.incorrect {
+    background: #fff3f0;
+    border-color: rgba(189, 67, 50, 0.3);
+    color: var(--red);
+  }
+
+  @media (max-width: 980px) {
+    .stage {
+      grid-template-columns: 1fr;
+    }
+
+    .story-panel,
+    .accounting-panel {
+      min-height: 0;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .app {
+      padding: 18px 10px 28px;
+    }
+
+    .equity-scene {
+      min-height: 730px;
+    }
+
+    .company-card {
+      left: 5%;
+      top: 18px;
+      width: 150px;
+    }
+
+    .owner-area {
+      right: 5%;
+      top: 18px;
+      width: min(250px, 50%);
+    }
+
+    .pizza-wrap {
+      left: 50%;
+      top: 240px;
+      transform: translateX(-50%);
+    }
+
+    .flow-chip {
+      left: 50%;
+      top: 196px;
+      transform: translateX(-50%) translateY(10px);
+    }
+
+    .method-issue .flow-chip,
+    .method-treasury .flow-chip {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dividend-cash {
+      left: 50%;
+      bottom: 126px;
+      transform: translateX(-50%) translateY(12px);
+    }
+
+    .method-cash-dividend .dividend-cash {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .equity-note {
+      min-height: 94px;
+    }
+
+    .compare-strip,
+    .equity-tabs,
+    .answer-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .controls {
+      grid-template-columns: 1fr;
+    }
+
+    .journal-row {
+      font-size: 0.86rem;
+    }
+  }
+</style>
+</head>
+<body>
+<main class="app">
+  <header>
+    <div>
+      <div class="kicker">Ch 13 · Stockholders' Equity — Stock, Dividends, Treasury</div>
+      <h1>Who Owns the Company?</h1>
+    </div>
+    <p class="header-note">Common stock represents ownership. Chapter 13 asks what happens when shares are issued, bought back, or used to distribute value to stockholders.</p>
+  </header>
+
+  <section class="stage">
+    <section class="story-panel" aria-label="Stockholders equity ownership animation">
+      <div class="story-band">
+        <div class="step-count" id="stepCount">Step 1 of 7</div>
+        <h2 id="storyTitle">Common stock represents ownership in the corporation</h2>
+        <p id="storyText">Each share is like a ticket that represents a piece of ownership in the company.</p>
+      </div>
+
+      <div class="equity-scene method-overview" id="equityScene">
+        <div class="company-card">
+          <div class="company-label">Company</div>
+          <div class="company-name">Campus Co.</div>
+          <div class="cash-chip" id="cashChip">$10,000 cash</div>
+        </div>
+
+        <div class="owner-area">
+          <div class="owner-title">Shares of common stock</div>
+          <div class="ticket-grid">
+            <div class="ticket">#1</div>
+            <div class="ticket">#2</div>
+            <div class="ticket">#3</div>
+            <div class="ticket">#4</div>
+            <div class="ticket">#5</div>
+            <div class="ticket">#6</div>
+            <div class="ticket">#7</div>
+            <div class="ticket">#8</div>
+            <div class="ticket extra">#9</div>
+            <div class="ticket extra">#10</div>
+            <div class="ticket split-extra">#11</div>
+            <div class="ticket split-extra">#12</div>
+          </div>
+        </div>
+
+        <div class="flow-chip" id="flowChip">Ownership moves</div>
+
+        <div class="pizza-wrap">
+          <div class="pizza"></div>
+          <div class="pizza-label" id="pizzaLabel">One company pie</div>
+        </div>
+
+        <div class="dividend-cash">$500 cash dividend</div>
+
+        <div class="equity-note">
+          <div class="equity-kicker" id="equityKicker">Ownership idea</div>
+          <div class="equity-text" id="equityText">The pie represents total ownership. Shares are the slices or tickets that divide that ownership.</div>
+        </div>
+      </div>
+
+      <div class="compare-strip">
+        <div class="compare-card">
+          <div class="compare-title">Issuing stock</div>
+          <div class="compare-main">Cash comes in</div>
+          <div class="compare-note">The company receives cash and investors receive ownership.</div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-title">Treasury stock</div>
+          <div class="compare-main">Company buys shares back</div>
+          <div class="compare-note">Treasury stock reduces total stockholders' equity.</div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-title">Dividends and splits</div>
+          <div class="compare-main">Value is distributed or divided</div>
+          <div class="compare-note">Cash dividends reduce assets and equity; stock dividends and splits change share count.</div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="accounting-panel">
+      <div class="panel-title">
+        <h2>Ownership Events</h2>
+        <span class="active-pill" id="activePill">Step 1 of 7</span>
+      </div>
+
+      <div class="tab-instruction">Click each event below. For each one, ask yourself four questions: does <b>cash</b> change? does the <b>share count</b> change? does <b>total equity</b> change? does each owner's <b>%</b> change? Not every event affects all four.</div>
+      <div class="equity-tabs" id="equityTabs"></div>
+
+      <div class="controls">
+        <button class="btn btn-muted" type="button" id="prevBtn">Previous</button>
+        <button class="btn btn-main" type="button" id="nextBtn">Next Step</button>
+        <button class="btn btn-reset" type="button" id="resetBtn">Reset</button>
+      </div>
+
+      <div class="focus-card">
+        <div class="focus-kicker" id="focusKicker">Ownership idea</div>
+        <div class="focus-title" id="focusTitle">Shares divide ownership</div>
+        <p class="focus-text" id="focusText">Common stockholders own pieces of the corporation, but the corporation is a separate legal entity.</p>
+        <div class="exam-clue" id="examClueBox" hidden></div>
+      </div>
+
+      <div class="example-card">
+        <div class="example-kicker" id="exampleKicker">Accounting example</div>
+        <div class="example-title" id="exampleTitle">Stockholders' equity overview</div>
+        <div class="formula-box">
+          <div class="formula-label" id="formulaLabel">Rule</div>
+          <div class="formula-text" id="formulaText">Identify whether cash, shares outstanding, retained earnings, or treasury stock changes.</div>
+        </div>
+        <div class="journal-table" id="journalTable"></div>
+        <p class="example-note" id="exampleNote">The ownership metaphor helps connect abstract equity accounts to what happened.</p>
+      </div>
+
+      <div class="quiz-card" id="quizCard"></div>
+    </aside>
+  </section>
+</main>
+
+<script>
+  const defaultChoices = ["Cash increases", "Treasury stock increases", "Retained earnings decreases", "Share count changes"];
+
+  const steps = [
+    {
+      id: "overview",
+      tab: "Overview",
+      tabSub: "Shares = ownership",
+      storyTitle: "Common stock represents ownership in the corporation",
+      storyText: "Each share of common stock represents one piece of ownership in the corporation.",
+      pizzaLabel: "One company pie",
+      equityKicker: "Ownership idea",
+      equityText: "The pie represents total ownership. Shares are the slices or tickets that divide that ownership.",
+      flowText: "Shares = ownership",
+      focusKicker: "Ownership idea",
+      focusTitle: "Shares divide ownership",
+      focusText: "Common stockholders own pieces of the corporation, but the corporation is a separate legal entity.",
+      quiz: {
+        question: "What does common stock represent?",
+        choices: ["Ownership in the corporation", "A debt obligation of the corporation", "An asset on the company's balance sheet", "A guaranteed return of cash"],
+        correct: "Ownership in the corporation",
+        correctText: "Correct. Common stock represents ownership in the corporation — equity, not debt.",
+        incorrectText: "Try again. Common stock is EQUITY (not debt or an asset), and dividends are never guaranteed."
+      },
+      exampleKicker: "Accounting example",
+      exampleTitle: "Stockholders' equity overview",
+      formulaLabel: "Rule",
+      formulaText: "Identify whether cash, shares outstanding, retained earnings, or treasury stock changes.",
+      columns: ["Event", "What changes", "Equity effect"],
+      rows: [
+        ["Issue stock", "Cash and contributed capital", "Equity increases"],
+        ["Buy treasury stock", "Treasury stock and cash", "Equity decreases"],
+        ["Cash dividend", "Cash and retained earnings", "Equity decreases"],
+        ["Stock dividend or split", "Shares outstanding", "Total value may not increase"]
+      ],
+      note: "Chapter 13 is easier when students ask: Who owns the company, and did cash actually move?"
+    },
+    {
+      id: "issue",
+      tab: "Issue stock",
+      tabSub: "Cash for ownership",
+      storyTitle: "The company issues common stock",
+      storyText: "Investors give cash to the company. In return, they receive shares of common stock.",
+      pizzaLabel: "New owners get slices",
+      equityKicker: "Issuing stock",
+      equityText: "Issuing stock increases assets and increases stockholders' equity.",
+      flowText: "Cash in, shares out",
+      focusKicker: "Issuing stock",
+      focusTitle: "Company receives cash; investors receive ownership",
+      focusText: "Common stock and paid-in capital record the owners' investment in the corporation.",
+      examClue: "Par value is usually a legal/accounting amount, not the market price investors paid.",
+      quiz: {
+        question: "When a company issues common stock for cash, what happens to the company?",
+        choices: ["Cash increases", "Cash decreases", "Treasury stock increases", "No journal entry"],
+        correct: "Cash increases",
+        correctText: "Correct. The company receives cash when it issues stock.",
+        incorrectText: "Try again. Investors pay cash to receive ownership shares."
+      },
+      exampleKicker: "Accounting example",
+      exampleTitle: "Issue common stock above par",
+      formulaLabel: "Example",
+      formulaText: "Issue 1,000 shares of $1 par common stock for $10 per share. Cash received = $10,000.",
+      columns: ["Account", "Debit", "Credit"],
+      rows: [
+        ["Cash", "$10,000", ""],
+        ["Common Stock", "", "$1,000", "credit"],
+        ["Paid-In Capital in Excess of Par", "", "$9,000", "credit"]
+      ],
+      note: "Common Stock is credited for PAR VALUE. The amount above par goes to Paid-In Capital in Excess of Par. For NO-PAR stock, the entire issue price goes to Common Stock (no PIC account). STATED-VALUE stock works like par but is set by the directors instead of the corporate charter."
+    },
+    {
+      id: "preferred",
+      tab: "Preferred stock",
+      tabSub: "Priority rights",
+      storyTitle: "Preferred stock has priority over common",
+      storyText: "Some companies issue preferred stock alongside common. Preferred shareholders get dividends and liquidation proceeds BEFORE common shareholders.",
+      pizzaLabel: "Different ticket classes",
+      equityKicker: "Preferred stock",
+      equityText: "Preferred stock has a fixed dividend rate and liquidation preference over common stock.",
+      flowText: "Preferred shares out",
+      focusKicker: "Preferred stock",
+      focusTitle: "Different class, different rights",
+      focusText: "Preferred dividends usually pay a fixed rate. Some preferred is convertible to common. Some is callable by the company. Preferred usually has NO voting rights — the trade-off for priority.",
+      examClue: "Cumulative preferred: unpaid dividends accumulate as 'dividends in arrears' and must be paid IN FULL before common can receive ANY dividends. Always check whether preferred is cumulative on exams.",
+      quiz: {
+        question: "What right do preferred stockholders typically have over common stockholders?",
+        choices: ["Priority for dividends and liquidation", "Higher voting power", "Guaranteed cash return", "Tax-free income"],
+        correct: "Priority for dividends and liquidation",
+        correctText: "Correct. Preferred stockholders receive dividends and liquidation proceeds before common — but typically have no voting rights and no guaranteed return.",
+        incorrectText: "Try again. Preferred stockholders get paid FIRST (priority), but they typically trade away voting rights for this preference."
+      },
+      exampleKicker: "Accounting example",
+      exampleTitle: "Issue preferred stock",
+      formulaLabel: "Example",
+      formulaText: "Issue 200 shares of $50 par, 6% preferred stock for $55 per share. Cash = 200 × $55 = $11,000.",
+      columns: ["Account", "Debit", "Credit"],
+      rows: [
+        ["Cash", "$11,000", ""],
+        ["Preferred Stock", "", "$10,000", "credit"],
+        ["Paid-In Capital in Excess of Par—Preferred", "", "$1,000", "credit"]
+      ],
+      note: "Preferred Stock uses its own par account, separate from Common Stock. Annual preferred dividend on this issue: $50 par × 6% = $3 per share × 200 = $600/year when declared."
+    },
+    {
+      id: "treasury",
+      tab: "Treasury stock",
+      tabSub: "Buyback",
+      storyTitle: "The company buys back some of its own shares",
+      storyText: "Treasury stock is the corporation's own stock that it has issued and then bought back.",
+      pizzaLabel: "Some tickets return to company",
+      equityKicker: "Treasury stock",
+      equityText: "Treasury stock is not an asset. It is a contra-equity account that reduces total stockholders' equity.",
+      flowText: "Shares bought back",
+      focusKicker: "Treasury stock",
+      focusTitle: "Buybacks reduce stockholders' equity",
+      focusText: "The company pays cash to repurchase its own shares. Those shares are held as treasury stock.",
+      examClue: "Treasury stock is contra-equity, not an asset. It usually legally RESTRICTS retained earnings — the cost of treasury stock cannot be paid out as dividends until the shares are reissued or retired.",
+      quiz: {
+        question: "What kind of account is Treasury Stock?",
+        choices: ["Contra-equity", "Asset", "Revenue", "Liability"],
+        correct: "Contra-equity",
+        correctText: "Correct. Treasury Stock reduces total stockholders' equity.",
+        incorrectText: "Try again. Treasury Stock is the company's own stock bought back, so it reduces equity."
+      },
+      exampleKicker: "Accounting example",
+      exampleTitle: "Purchase treasury stock",
+      formulaLabel: "Example",
+      formulaText: "Buy back 100 shares at $12 per share. Cost = $1,200.",
+      columns: ["Account", "Debit", "Credit"],
+      rows: [
+        ["Treasury Stock", "$1,200", ""],
+        ["Cash", "", "$1,200", "credit"]
+      ],
+      note: "The cost method records Treasury Stock at the amount paid to reacquire the shares."
+    },
+    {
+      id: "cash-dividend",
+      tab: "Cash dividend",
+      tabSub: "Cash to owners",
+      storyTitle: "The company distributes cash to stockholders",
+      storyText: "A cash dividend sends company cash to stockholders. It reduces assets and reduces retained earnings.",
+      pizzaLabel: "Cash leaves the company",
+      equityKicker: "Cash dividend",
+      equityText: "A cash dividend distributes value to owners, so retained earnings decreases.",
+      flowText: "Cash to owners",
+      focusKicker: "Cash dividend",
+      focusTitle: "Cash dividends reduce retained earnings",
+      focusText: "Dividends are distributions to owners. They are not expenses because they do not help generate revenue.",
+      examClue: "Three dividend dates: (1) DECLARATION — record liability (Dr Cash Dividends / Cr Dividends Payable) · (2) RECORD — identify stockholders, NO entry · (3) PAYMENT — pay cash (Dr Dividends Payable / Cr Cash). Dividends are NOT expenses.",
+      quiz: {
+        question: "After year-end closing, a cash dividend has ultimately reduced which equity account?",
+        choices: ["Retained earnings", "Common stock", "Treasury stock", "Bonds payable"],
+        correct: "Retained earnings",
+        correctText: "Correct. The temporary Cash Dividends account closes to Retained Earnings at year-end, so the net effect is a reduction in RE.",
+        incorrectText: "Try again. Dividends are distributions of retained earnings — Cash Dividends is a temporary account that closes to RE at year-end."
+      },
+      exampleKicker: "Accounting example",
+      exampleTitle: "Declare and pay a cash dividend",
+      formulaLabel: "Example",
+      formulaText: "Declare a $500 cash dividend, then pay it to stockholders.",
+      columns: ["Account", "Debit", "Credit"],
+      rows: [
+        ["Cash Dividends", "$500", ""],
+        ["Dividends Payable", "", "$500", "credit"],
+        ["Dividends Payable", "$500", ""],
+        ["Cash", "", "$500", "credit"]
+      ],
+      note: "Some courses use Retained Earnings directly at declaration. Others use a temporary Dividends account that closes to Retained Earnings."
+    },
+    {
+      id: "stock-dividend",
+      tab: "Stock dividend",
+      tabSub: "More tickets",
+      storyTitle: "The company gives stockholders more shares",
+      storyText: "A stock dividend gives stockholders additional shares instead of cash. The company pie is divided into more tickets.",
+      pizzaLabel: "More tickets, same pie",
+      equityKicker: "Stock dividend",
+      equityText: "A stock dividend increases shares outstanding but usually does not increase total stockholders' equity.",
+      flowText: "More shares",
+      focusKicker: "Stock dividend",
+      focusTitle: "More shares does not automatically mean more total value",
+      focusText: "A stock dividend moves amounts within stockholders' equity. No cash leaves the company.",
+      examClue: "Small stock dividend (<20–25% of shares): record at MARKET value. Large stock dividend (>20–25%): record at PAR value, similar to a split. Either way, total equity stays the same — only amounts within equity shift.",
+      quiz: {
+        question: "What is the big idea of a stock dividend?",
+        choices: ["More shares, not more cash", "Cash leaves the company", "Treasury stock increases", "Debt is repaid"],
+        correct: "More shares, not more cash",
+        correctText: "Correct. Stockholders receive more shares, but the company does not pay cash.",
+        incorrectText: "Try again. A stock dividend uses shares, not cash."
+      },
+      exampleKicker: "Accounting example",
+      exampleTitle: "Small stock dividend",
+      formulaLabel: "Example",
+      formulaText: "10% stock dividend on 1,000 shares = 100 new shares. $1 par, $12 market price.",
+      columns: ["Account", "Debit", "Credit"],
+      rows: [
+        ["Stock Dividends", "$1,200", ""],
+        ["Common Stock Dividend Distributable", "", "$100", "credit"],
+        ["Paid-In Capital in Excess of Par", "", "$1,100", "credit"]
+      ],
+      note: "A small stock dividend is often recorded at market value. It shifts value within equity rather than paying cash to owners."
+    },
+    {
+      id: "stock-split",
+      tab: "Stock split",
+      tabSub: "More shares, lower par",
+      storyTitle: "A stock split divides the same ownership into more shares",
+      storyText: "In a stock split, each stockholder owns more shares, but the total ownership percentage does not change.",
+      pizzaLabel: "Same pie, thinner slices",
+      equityKicker: "Stock split",
+      equityText: "A stock split changes the number of shares and par value per share, but no journal entry is recorded.",
+      flowText: "Split tickets",
+      focusKicker: "Stock split",
+      focusTitle: "Same total ownership, more shares",
+      focusText: "A 2-for-1 split doubles the share count and cuts par value per share in half. Total stockholders' equity does not change.",
+      examClue: "Stock split: no journal entry. The share count changes, but total equity does not.",
+      quiz: {
+        question: "What journal entry is recorded for a stock split?",
+        choices: ["No journal entry", "Debit Cash", "Credit Revenue", "Debit Treasury Stock"],
+        correct: "No journal entry",
+        correctText: "Correct. A stock split changes share data but does not record a journal entry.",
+        incorrectText: "Try again. A stock split changes shares outstanding and par value, not cash or revenue."
+      },
+      exampleKicker: "Accounting example",
+      exampleTitle: "2-for-1 stock split",
+      formulaLabel: "Example",
+      formulaText: "1,000 shares at $1 par become 2,000 shares at $0.50 par. Total par stays $1,000.",
+      columns: ["Item", "Before split", "After split"],
+      rows: [
+        ["Shares outstanding", "1,000", "2,000"],
+        ["Par value per share", "$1.00", "$0.50"],
+        ["Total par value", "$1,000", "$1,000"]
+      ],
+      note: "A stock split divides the same ownership into more pieces. It does not create new company value by itself."
+    },
+    {
+      id: "summary",
+      tab: "Compare",
+      tabSub: "What changed?",
+      storyTitle: "Ask what changed: cash, shares, or equity",
+      storyText: "Stockholders' equity events feel abstract until students track shares and cash separately.",
+      pizzaLabel: "Track the pie and the tickets",
+      equityKicker: "Conclusion",
+      equityText: "Issuance brings cash in. Treasury stock and cash dividends reduce equity. Stock dividends and splits increase share count without necessarily increasing total value.",
+      flowText: "Compare events",
+      focusKicker: "Conclusion",
+      focusTitle: "Separate ownership from cash",
+      focusText: "Common stock, preferred stock, treasury stock, retained earnings, and dividends all tell different parts of the ownership story.",
+      examClue: "EPS = (Net Income − Preferred Dividends) ÷ Weighted Average Common Shares Outstanding. Stock splits and stock dividends retroactively adjust the share-count denominator.",
+      quiz: {
+        question: "Which event gives investors ownership and brings cash into the company?",
+        choices: ["Issuing stock", "Buying treasury stock", "Paying a cash dividend", "Stock split"],
+        correct: "Issuing stock",
+        correctText: "Correct. Issuing stock brings cash into the company and gives ownership to investors.",
+        incorrectText: "Try again. Look for the event where investors pay the company for ownership."
+      },
+      exampleKicker: "Big takeaway",
+      exampleTitle: "Ownership event map",
+      formulaLabel: "Memory hook",
+      formulaText: "Issuance = cash in. Treasury stock = buyback. Cash dividend = cash out. Stock dividend/split = more shares.",
+      columns: ["Event", "Cash moves?", "Main equity effect"],
+      rows: [
+        ["Issue common stock", "Yes, cash in", "Contributed capital increases"],
+        ["Issue preferred stock", "Yes, cash in", "Preferred capital increases"],
+        ["Treasury stock", "Yes, cash out", "Total equity decreases"],
+        ["Cash dividend", "Yes, cash out", "Retained earnings decreases"],
+        ["Stock dividend", "No", "Amounts shift within equity"],
+        ["Stock split", "No", "No journal entry"]
+      ],
+      note: "The ownership metaphor helps: the company pie can be financed, bought back, distributed, or divided into more slices."
+    }
+  ];
+
+  let activeIndex = 0;
+  let selectedChoice = "";
+
+  const el = {
+    stepCount: document.getElementById("stepCount"),
+    storyTitle: document.getElementById("storyTitle"),
+    storyText: document.getElementById("storyText"),
+    equityScene: document.getElementById("equityScene"),
+    pizzaLabel: document.getElementById("pizzaLabel"),
+    flowChip: document.getElementById("flowChip"),
+    equityKicker: document.getElementById("equityKicker"),
+    equityText: document.getElementById("equityText"),
+    activePill: document.getElementById("activePill"),
+    equityTabs: document.getElementById("equityTabs"),
+    prevBtn: document.getElementById("prevBtn"),
+    nextBtn: document.getElementById("nextBtn"),
+    resetBtn: document.getElementById("resetBtn"),
+    focusKicker: document.getElementById("focusKicker"),
+    focusTitle: document.getElementById("focusTitle"),
+    focusText: document.getElementById("focusText"),
+    examClueBox: document.getElementById("examClueBox"),
+    exampleKicker: document.getElementById("exampleKicker"),
+    exampleTitle: document.getElementById("exampleTitle"),
+    formulaLabel: document.getElementById("formulaLabel"),
+    formulaText: document.getElementById("formulaText"),
+    journalTable: document.getElementById("journalTable"),
+    exampleNote: document.getElementById("exampleNote"),
+    quizCard: document.getElementById("quizCard")
+  };
+
+  function renderTabs() {
+    el.equityTabs.innerHTML = "";
+
+    steps.forEach((step, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "equity-tab";
+      button.classList.toggle("active", index === activeIndex);
+      button.setAttribute("aria-pressed", index === activeIndex ? "true" : "false");
+      button.innerHTML = `
+        <span class="tab-number">${index + 1}</span>
+        <span class="tab-copy">
+          <span class="tab-main">${step.tab}</span>
+          <span class="tab-sub">${step.tabSub}</span>
+        </span>
+      `;
+      button.addEventListener("click", () => {
+        activeIndex = index;
+        selectedChoice = "";
+        render();
+      });
+      el.equityTabs.appendChild(button);
+    });
+  }
+
+  function renderExample(step) {
+    const columns = step.columns || ["Account", "Debit", "Credit"];
+    const isDebitCredit = columns[1] === "Debit" && columns[2] === "Credit";
+    const gridTemplate = isDebitCredit
+      ? "minmax(0, 1fr) 84px 84px"
+      : "minmax(0, 1fr) minmax(0, 0.9fr) minmax(0, 1fr)";
+    const flagIndex = columns.length;
+    const headerCells = columns.map((column) => `<div>${column}</div>`).join("");
+    const rows = step.rows.map((row) => {
+      const isCredit = row[flagIndex] === "credit";
+      const cells = columns.map((_, index) => {
+        const cls = index === 0 && isCredit ? "credit-account" : "";
+        return `<div class="${cls}">${row[index] || ""}</div>`;
+      }).join("");
+      return `<div class="journal-row" style="grid-template-columns: ${gridTemplate}">${cells}</div>`;
+    }).join("");
+
+    el.exampleKicker.textContent = step.exampleKicker;
+    el.exampleTitle.textContent = step.exampleTitle;
+    el.formulaLabel.textContent = step.formulaLabel;
+    el.formulaText.textContent = step.formulaText;
+    el.journalTable.innerHTML = `
+      <div class="journal-row header" style="grid-template-columns: ${gridTemplate}">
+        ${headerCells}
+      </div>
+      ${rows}
+    `;
+    el.exampleNote.textContent = step.note;
+  }
+
+  function renderQuiz(quiz) {
+    const quizChoices = quiz.choices || defaultChoices;
+    const buttons = quizChoices.map((choice) => {
+      const status = selectedChoice === choice
+        ? (choice === quiz.correct ? " selected correct" : " selected incorrect")
+        : "";
+      return `<button class="answer-btn${status}" type="button" data-choice="${choice}">${choice}</button>`;
+    }).join("");
+
+    const feedbackClass = selectedChoice
+      ? (selectedChoice === quiz.correct ? " correct" : " incorrect")
+      : "";
+    const feedbackText = selectedChoice
+      ? (selectedChoice === quiz.correct ? quiz.correctText : quiz.incorrectText)
+      : "Pause here and ask students to choose before revealing the answer.";
+
+    el.quizCard.innerHTML = `
+      <div class="quiz-kicker">Student choice</div>
+      <div class="focus-title">${quiz.question}</div>
+      <div class="answer-grid">${buttons}</div>
+      <div class="feedback${feedbackClass}">${feedbackText}</div>
+    `;
+
+    el.quizCard.querySelectorAll(".answer-btn").forEach((button) => {
+      button.addEventListener("click", () => {
+        selectedChoice = button.dataset.choice;
+        render();
+      });
+    });
+  }
+
+  function render() {
+    const step = steps[activeIndex];
+    const countText = "Step " + (activeIndex + 1) + " of " + steps.length;
+
+    el.stepCount.textContent = countText;
+    el.storyTitle.textContent = step.storyTitle;
+    el.storyText.textContent = step.storyText;
+    el.equityScene.className = "equity-scene method-" + step.id;
+    el.pizzaLabel.textContent = step.pizzaLabel;
+    el.flowChip.textContent = step.flowText;
+    el.equityKicker.textContent = step.equityKicker;
+    el.equityText.textContent = step.equityText;
+    el.activePill.textContent = countText;
+    el.focusKicker.textContent = step.focusKicker;
+    el.focusTitle.textContent = step.focusTitle;
+    el.focusText.textContent = step.focusText;
+
+    if (step.examClue) {
+      el.examClueBox.textContent = step.examClue;
+      el.examClueBox.hidden = false;
+    } else {
+      el.examClueBox.textContent = "";
+      el.examClueBox.hidden = true;
+    }
+
+    el.prevBtn.disabled = activeIndex === 0;
+    el.nextBtn.disabled = activeIndex === steps.length - 1;
+
+    renderTabs();
+    renderExample(step);
+    renderQuiz(step.quiz);
+  }
+
+  el.prevBtn.addEventListener("click", () => {
+    if (activeIndex > 0) {
+      activeIndex -= 1;
+      selectedChoice = "";
+      render();
+    }
+  });
+
+  el.nextBtn.addEventListener("click", () => {
+    if (activeIndex < steps.length - 1) {
+      activeIndex += 1;
+      selectedChoice = "";
+      render();
+    }
+  });
+
+  el.resetBtn.addEventListener("click", () => {
+    activeIndex = 0;
+    selectedChoice = "";
+    render();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft" && activeIndex > 0) {
+      activeIndex -= 1;
+      selectedChoice = "";
+      render();
+    }
+
+    if (event.key === "ArrowRight" && activeIndex < steps.length - 1) {
+      activeIndex += 1;
+      selectedChoice = "";
+      render();
+    }
+  });
+
+  render();
+</script>
+<footer style="text-align:center;color:#5c6878;font-size:0.82rem;padding:18px 12px 10px;border-top:1px solid #d7e0ea;margin-top:24px;">Reference: Horngren, <i>Financial &amp; Managerial Accounting</i> (7th ed.) — Ch&nbsp;13 · Stockholders' Equity — Stock, Dividends, Treasury</footer>
+</body>
+</html>

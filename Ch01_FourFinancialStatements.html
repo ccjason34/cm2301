@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Meet the Four Financial Statements</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: linear-gradient(180deg, #f8fafc 0%, #edf3f7 100%);
+  color: #172233;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+header {
+  text-align: center;
+  padding: 1.4rem 1rem 0.4rem;
+}
+header h1 { font-size: 1.45rem; font-weight: 800; color: #172233; }
+header p  { font-size: 0.8rem; color: #5c6878; margin-top: 0.25rem; }
+
+/* ── Scene ── */
+.scene-wrap {
+  width: 100%; max-width: 780px;
+  padding: 0 1rem;
+  position: relative;
+}
+.scene {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 780/480;
+  overflow: visible;
+}
+.scene-wrap { overflow: visible; }
+
+/* ── Cards ── */
+.card {
+  position: absolute;
+  width: 23%;
+  aspect-ratio: 1/1.05;
+  background: #ffffff;
+  border: 2px solid #d7e0ea;
+  border-radius: 16px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 5px;
+  transition: border-color .45s, box-shadow .45s, transform .45s, opacity .4s;
+  z-index: 3;
+}
+.card .icon  { font-size: 2rem; line-height: 1; transition: transform .45s cubic-bezier(.34,1.56,.64,1); }
+.card .cname { font-size: .68rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: #5c6878; text-align: center; padding: 0 6px; line-height: 1.3; transition: color .4s; }
+.card .quote { font-size: .75rem; color: #94a3b8; text-align: center; padding: 0 8px; line-height: 1.4; transition: color .4s; font-style: italic; font-weight: 600; }
+
+#c-is  { left:  3.5%; top: 7%; }
+#c-sre { right: 3.5%; top: 7%; }
+#c-scf { left:  3.5%; bottom: 7%; }
+#c-bs  { right: 3.5%; bottom: 7%; }
+
+/* active */
+.card.active { transform: scale(1.07); z-index: 6; }
+.card.active .icon  { transform: scale(1.18) translateY(-4px); }
+/* quote always visible — dim parent card handles inactive visibility */
+
+#c-is.active  { border-color:#34d399; box-shadow:0 0 30px rgba(52,211,153,.45); }
+#c-sre.active { border-color:#818cf8; box-shadow:0 0 30px rgba(129,140,248,.45); }
+#c-scf.active { border-color:#38bdf8; box-shadow:0 0 30px rgba(56,189,248,.45); }
+#c-bs.active  { border-color:#f59e0b; box-shadow:0 0 30px rgba(245,158,11,.45); }
+
+#c-is.active  .cname { color:#34d399; }
+#c-sre.active .cname { color:#818cf8; }
+#c-scf.active .cname { color:#38bdf8; }
+#c-bs.active  .cname { color:#f59e0b; }
+
+#c-is.active  .quote { color:#a7f3d0; }
+#c-sre.active .quote { color:#c4b5fd; }
+#c-scf.active .quote { color:#7dd3fc; }
+#c-bs.active  .quote { color:#fcd34d; }
+
+.card.dim { opacity: .22; }
+
+@keyframes bounceIn {
+  0%  { transform:scale(.55) translateY(16px); opacity:0; }
+  65% { transform:scale(1.1); opacity:1; }
+  82% { transform:scale(.97); }
+  100%{ transform:scale(1.07); opacity:1; }
+}
+.card.bounce { animation: bounceIn .65s cubic-bezier(.34,1.56,.64,1) forwards; }
+
+@keyframes allPulse {
+  0%,100% { filter: brightness(1); }
+  50%     { filter: brightness(1.35); }
+}
+.card.pulse { animation: allPulse 1.1s ease 3; }
+
+/* ── SVG layer ── */
+.svg-layer {
+  position: absolute;
+  inset: 0; width: 100%; height: 100%;
+  pointer-events: none; overflow: visible;
+}
+
+/* arrows */
+.apath {
+  fill: none; stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+  transition: stroke-dashoffset 1s ease;
+}
+/* dashoffset driven by JS */
+#a1 { stroke: #34d399; }
+#a2 { stroke: #818cf8; }
+#a3 { stroke: #38bdf8; }
+
+/* arrow labels */
+.alabel {
+  font-size: 13px; font-weight: 800;
+  letter-spacing: .04em;
+  fill: #172233;
+  opacity: 0; transition: opacity .4s .8s;
+}
+.alabel.show { opacity: 1; }
+
+/* ── Narration ── */
+#narration-wrap {
+  width: 100%; max-width: 780px;
+  padding: .75rem 1.5rem;
+  min-height: 80px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: .4rem;
+}
+#stage-label {
+  font-size: .95rem; text-transform: uppercase; letter-spacing: .08em;
+  color: #5c6878; font-weight: 800;
+}
+#narration {
+  font-size: 1.15rem; font-weight: 600; color: #172233;
+  text-align: center; line-height: 1.55;
+  transition: color .3s;
+}
+#narration span { font-style: italic; }
+
+/* ── Progress dots ── */
+#progress {
+  display: flex; gap: 7px; justify-content: center; padding: .3rem;
+}
+.dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #ffffff; border: 2px solid #d7e0ea;
+  transition: background .3s, transform .3s, border-color .3s;
+}
+.dot.done   { background: #94a3b8; border-color:#5c6878; }
+.dot.active { background: #38bdf8; border-color:#38bdf8; transform:scale(1.35); }
+
+/* ── Controls ── */
+#controls {
+  display: flex; gap: .6rem; padding: .6rem 1rem 1.4rem;
+}
+.btn {
+  padding: .48rem 1.3rem;
+  border: none; border-radius: 8px;
+  font-size: .8rem; font-weight: 700;
+  cursor: pointer; color: #fff;
+  transition: transform .1s, opacity .15s;
+}
+.btn:active { transform: scale(.95); }
+.btn-cyan { background: linear-gradient(135deg,#0891b2,#38bdf8); }
+.btn-gray { background: linear-gradient(135deg,#6b7788,#94a3b8); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── Tabs ── */
+.tab-bar { display:flex; gap:.5rem; justify-content:center; padding:.65rem 1rem .2rem; }
+.tab-btn { padding:.42rem 1.5rem; border:2px solid #d7e0ea; background:transparent; border-radius:20px; font-size:.88rem; font-weight:700; color:#5c6878; cursor:pointer; transition:all .2s; }
+.tab-btn.active { background:#38bdf8; border-color:#38bdf8; color:#ffffff; }
+.tab-btn:hover:not(.active) { border-color:#a0aec0; color:#172233; }
+
+/* ── Quiz ── */
+.quiz-wrap { width:100%; max-width:720px; margin:0 auto; padding:1rem 1rem 2rem; display:flex; flex-direction:column; gap:1.25rem; }
+.q-card { background:#ffffff; border:2px solid #d7e0ea; border-radius:14px; padding:1.3rem 1.5rem; }
+.q-num  { font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:#5c6878; font-weight:700; margin-bottom:.5rem; }
+.q-text { font-size:1.05rem; font-weight:700; color:#172233; line-height:1.45; margin-bottom:.95rem; }
+.q-opts { display:flex; flex-direction:column; gap:.45rem; }
+.opt { display:flex; align-items:center; gap:.75rem; background:#f9fbfd; border:2px solid #d7e0ea; border-radius:9px; padding:.65rem 1rem; cursor:pointer; transition:border-color .15s, background .15s; font-size:.9rem; color:#172233; }
+.opt:hover:not(.locked) { border-color:#a0aec0; background:#eef4fb; }
+.opt input[type=radio] { accent-color:#38bdf8; width:15px; height:15px; flex-shrink:0; }
+.opt.correct { border-color:#34d399; background:rgba(52,211,153,.12); color:#a7f3d0; }
+.opt.wrong   { border-color:#f87171; background:rgba(248,113,113,.12); color:#fca5a5; }
+.q-fb { margin-top:.75rem; font-size:.85rem; font-weight:600; line-height:1.45; min-height:1rem; }
+.q-fb.ok  { color:#34d399; }
+.q-fb.err { color:#f87171; }
+.quiz-footer { display:flex; flex-direction:column; align-items:center; gap:.75rem; padding-bottom:1rem; }
+.score-box { font-size:1.1rem; font-weight:800; color:#172233; display:none; text-align:center; }
+</style>
+</head>
+<body>
+
+<header>
+  <div style="color:#2f80ed;font-size:0.78rem;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Ch 1 · The Four Financial Statements</div>
+  <h1>Meet the Four Financial Statements</h1>
+  <p style="color:#5c6878;font-size:0.95rem;line-height:1.45;margin:8px 0 0;max-width:680px;">Click Next (or press →) to walk through all four statements in order. Watch how each statement <b>flows into</b> the next — net income lands on the Statement of Retained Earnings, ending retained earnings lands on the Balance Sheet, and cash lands on the Statement of Cash Flows.</p>
+</header>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('anim')">📊 Animation</button>
+  <button class="tab-btn" onclick="switchTab('quiz')">📝 Quiz</button>
+</div>
+
+<div id="pane-anim">
+
+<div class="scene-wrap">
+<div class="scene" id="scene">
+
+  <!-- Cards -->
+  <div class="card dim" id="c-is">
+    <div class="icon">📊</div>
+    <div class="cname">Income<br>Statement</div>
+    <div class="quote">"I show if you<br>made money"</div>
+  </div>
+
+  <div class="card dim" id="c-sre">
+    <div class="icon">💰</div>
+    <div class="cname">Statement of<br>Retained Earnings</div>
+    <div class="quote">"I show what<br>you kept"</div>
+  </div>
+
+  <div class="card dim" id="c-scf">
+    <div class="icon">💸</div>
+    <div class="cname">Statement of<br>Cash Flows</div>
+    <div class="quote">"I show where cash<br>actually went"</div>
+  </div>
+
+  <div class="card dim" id="c-bs">
+    <div class="icon">⚖️</div>
+    <div class="cname">Balance<br>Sheet</div>
+    <div class="quote">"I show what you<br>own and owe"</div>
+  </div>
+
+  <!-- SVG: arrows + labels + packets -->
+  <svg class="svg-layer" id="svg" viewBox="0 0 780 480" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <marker id="mh-green"  markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L0,7 L9,3.5z" fill="#34d399"/></marker>
+      <marker id="mh-purple" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L0,7 L9,3.5z" fill="#818cf8"/></marker>
+      <marker id="mh-cyan"   markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L0,7 L9,3.5z" fill="#38bdf8"/></marker>
+      <filter id="glow-g"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      <filter id="glow-p"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      <filter id="glow-c"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+
+    <!-- Arrow 1: IS → SRE (curved arc, top) -->
+    <path id="a1" class="apath"
+      d="M 212,108 C 330,55 450,55 568,108"
+      marker-end="url(#mh-green)"/>
+    <text id="lbl1" class="alabel" x="390" y="52" text-anchor="middle">Net Income</text>
+
+    <!-- Arrow 2: SRE → BS (sweeps right, outside both cards) -->
+    <path id="a2" class="apath"
+      d="M 756,128 C 860,128 860,352 756,352"
+      marker-end="url(#mh-purple)"/>
+    <text id="lbl2" class="alabel" x="876" y="244" text-anchor="middle" transform="rotate(90,876,244)">Ending Retained Earnings</text>
+
+    <!-- Arrow 3: SCF → BS (bottom, straight) -->
+    <path id="a3" class="apath"
+      d="M 212,372 L 560,372"
+      marker-end="url(#mh-cyan)"/>
+    <text id="lbl3" class="alabel" x="386" y="395" text-anchor="middle">Ending Cash Balance</text>
+
+    <!-- Data packets -->
+    <circle id="pkt1" r="6" fill="#34d399" filter="url(#glow-g)" opacity="0">
+      <animateMotion id="pkt1-anim" dur="0.9s" repeatCount="3" begin="indefinite"
+        path="M 212,108 C 330,55 450,55 568,108"/>
+    </circle>
+    <circle id="pkt2" r="6" fill="#818cf8" filter="url(#glow-p)" opacity="0">
+      <animateMotion id="pkt2-anim" dur="1.1s" repeatCount="3" begin="indefinite"
+        path="M 756,128 C 860,128 860,352 756,352"/>
+    </circle>
+    <circle id="pkt3" r="6" fill="#38bdf8" filter="url(#glow-c)" opacity="0">
+      <animateMotion id="pkt3-anim" dur="0.9s" repeatCount="3" begin="indefinite"
+        path="M 212,372 L 560,372"/>
+    </circle>
+  </svg>
+
+</div><!-- .scene -->
+</div><!-- .scene-wrap -->
+
+<div id="narration-wrap">
+  <div id="stage-label">Introduction</div>
+  <div id="narration">Four statements — each with a different job — together they tell the <span>complete financial story</span> of a business.</div>
+</div>
+
+<div id="progress">
+  <div class="dot active" id="dot-0"></div>
+  <div class="dot" id="dot-1"></div>
+  <div class="dot" id="dot-2"></div>
+  <div class="dot" id="dot-3"></div>
+  <div class="dot" id="dot-4"></div>
+  <div class="dot" id="dot-5"></div>
+</div>
+
+<div id="controls">
+  <button class="btn btn-gray" onclick="restart()">↺ Restart</button>
+  <button class="btn btn-cyan" id="btn-next" onclick="advance()">Next →</button>
+</div>
+
+</div><!-- /pane-anim -->
+
+<div id="pane-quiz" style="display:none">
+  <div class="quiz-wrap">
+    <div class="q-card" id="q1">
+      <div class="q-num">Question 1 of 3</div>
+      <div class="q-text">Which statement provides a snapshot at one specific date — not a period of time?</div>
+      <div class="q-opts">
+        <label class="opt"><input type="radio" name="q1" value="A"> A) Income Statement</label>
+        <label class="opt"><input type="radio" name="q1" value="B"> B) Statement of Retained Earnings</label>
+        <label class="opt"><input type="radio" name="q1" value="C"> C) Balance Sheet</label>
+        <label class="opt"><input type="radio" name="q1" value="D"> D) Statement of Cash Flows</label>
+      </div>
+      <div class="q-fb" id="fb1"></div>
+    </div>
+    <div class="q-card" id="q2">
+      <div class="q-num">Question 2 of 3</div>
+      <div class="q-text">Net Income flows from the Income Statement directly into which statement?</div>
+      <div class="q-opts">
+        <label class="opt"><input type="radio" name="q2" value="A"> A) Balance Sheet</label>
+        <label class="opt"><input type="radio" name="q2" value="B"> B) Statement of Cash Flows</label>
+        <label class="opt"><input type="radio" name="q2" value="C"> C) Statement of Retained Earnings</label>
+        <label class="opt"><input type="radio" name="q2" value="D"> D) Trial Balance</label>
+      </div>
+      <div class="q-fb" id="fb2"></div>
+    </div>
+    <div class="q-card" id="q3">
+      <div class="q-num">Question 3 of 3</div>
+      <div class="q-text">The ending Cash balance on the Statement of Cash Flows must match Cash on which statement?</div>
+      <div class="q-opts">
+        <label class="opt"><input type="radio" name="q3" value="A"> A) Income Statement</label>
+        <label class="opt"><input type="radio" name="q3" value="B"> B) Statement of Retained Earnings</label>
+        <label class="opt"><input type="radio" name="q3" value="C"> C) Balance Sheet</label>
+        <label class="opt"><input type="radio" name="q3" value="D"> D) General Journal</label>
+      </div>
+      <div class="q-fb" id="fb3"></div>
+    </div>
+    <div class="quiz-footer">
+      <button class="btn btn-cyan" onclick="checkAnswers()">Check Answers</button>
+      <div class="score-box" id="score-box"></div>
+      <button class="btn btn-gray" id="retry-btn" onclick="retryQuiz()" style="display:none">↺ Try Again</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Measure each arrow's real path length and store it
+const arrowLengths = {};
+['a1','a2','a3'].forEach(id => {
+  const p = document.getElementById(id);
+  const len = Math.ceil(p.getTotalLength()) + 10;
+  arrowLengths[id] = len;
+  p.style.strokeDasharray = len;
+  p.style.strokeDashoffset = len;
+  p.style.transition = 'stroke-dashoffset 1s ease';
+});
+
+const cards  = { is: 'c-is', sre: 'c-sre', scf: 'c-scf', bs: 'c-bs' };
+const arrows = { a1: 'a1', a2: 'a2', a3: 'a3' };
+const labels = { lbl1: 'lbl1', lbl2: 'lbl2', lbl3: 'lbl3' };
+const pkts   = { pkt1: 'pkt1', pkt2: 'pkt2', pkt3: 'pkt3' };
+
+const stages = [
+  {
+    stageLabel: 'Introduction',
+    narration:  'Four statements — each with a different job — together they tell the <span>complete financial story</span> of a business.',
+    active: [],
+    drawArrows: [],
+    packets: []
+  },
+  {
+    stageLabel: 'Stage 1 of 4 · Income Statement',
+    narration:  '📊 <strong style="color:#34d399">Income Statement</strong> — "I show if you made money!" I list all <em>revenues</em> minus all <em>expenses</em> to produce <strong>Net Income</strong> over a period of time.',
+    active: ['is'],
+    drawArrows: [],
+    packets: []
+  },
+  {
+    stageLabel: 'Stage 2 of 4 · Statement of Retained Earnings',
+    narration:  '💰 <strong style="color:#818cf8">Statement of Retained Earnings</strong> — "I show what you kept!" Net Income from the Income Statement flows into me. I also subtract any dividends paid to owners.',
+    active: ['is', 'sre'],
+    drawArrows: ['a1'],
+    packets: ['pkt1']
+  },
+  {
+    stageLabel: 'Stage 3 of 4 · Balance Sheet',
+    narration:  '⚖️ <strong style="color:#f59e0b">Balance Sheet</strong> — "I show what you own and owe!" Ending Retained Earnings from the SRE flows into my Equity section. I am a <em>snapshot</em> on a specific date.',
+    active: ['is', 'sre', 'bs'],
+    drawArrows: ['a1', 'a2'],
+    packets: ['pkt2']
+  },
+  {
+    stageLabel: 'Stage 4 of 4 · Statement of Cash Flows',
+    narration:  '💸 <strong style="color:#38bdf8">Statement of Cash Flows</strong> — "I show where cash actually went!" My ending Cash balance must match the Cash figure on the Balance Sheet.',
+    active: ['is', 'sre', 'bs', 'scf'],
+    drawArrows: ['a1', 'a2', 'a3'],
+    packets: ['pkt3']
+  },
+  {
+    stageLabel: 'All Together',
+    narration:  '✅ All four statements are <strong>linked</strong>. Did we profit? → What did we keep? → What do we own &amp; owe? → Where did the cash go? Every number tells a connected story.',
+    active: ['is', 'sre', 'bs', 'scf'],
+    drawArrows: ['a1', 'a2', 'a3'],
+    packets: [],
+    allPulse: true
+  }
+];
+
+let currentStage = 0;
+
+function applyStage(idx) {
+  const s = stages[idx];
+
+  // Dots
+  for (let i = 0; i < stages.length; i++) {
+    const d = document.getElementById('dot-' + i);
+    d.className = 'dot' + (i < idx ? ' done' : i === idx ? ' active' : '');
+  }
+
+  // Cards
+  const allKeys = ['is', 'sre', 'bs', 'scf'];
+  allKeys.forEach(k => {
+    const el = document.getElementById(cards[k]);
+    el.classList.remove('active', 'dim', 'bounce', 'pulse');
+    const wasActive = s.active.includes(k);
+    if (wasActive) {
+      el.classList.add('active');
+      // bounce only for newly activated card
+      if (idx > 0 && stages[idx - 1] && !stages[idx - 1].active.includes(k)) {
+        el.classList.add('bounce');
+      }
+    } else {
+      el.classList.add('dim');
+    }
+  });
+
+  if (s.allPulse) {
+    allKeys.forEach(k => {
+      const el = document.getElementById(cards[k]);
+      el.classList.add('pulse');
+    });
+  }
+
+  // Arrows — drive via inline style so JS-set dasharray isn't overridden by CSS class
+  ['a1','a2','a3'].forEach(a => {
+    const el = document.getElementById(a);
+    const lbl = document.getElementById('lbl' + a.slice(1));
+    if (s.drawArrows.includes(a)) {
+      el.style.strokeDashoffset = '0';
+      lbl.classList.add('show');
+    } else {
+      el.style.strokeDashoffset = arrowLengths[a];
+      lbl.classList.remove('show');
+    }
+  });
+
+  // Packets
+  s.packets.forEach(p => {
+    const el = document.getElementById(p);
+    el.setAttribute('opacity', '1');
+    el.querySelector('animateMotion').beginElement();
+    setTimeout(() => el.setAttribute('opacity', '0'), 2800);
+  });
+
+  // Narration
+  document.getElementById('stage-label').textContent = s.stageLabel;
+  document.getElementById('narration').innerHTML = s.narration;
+
+  // Button
+  const btn = document.getElementById('btn-next');
+  btn.textContent = idx >= stages.length - 1 ? '↺ Replay' : 'Next →';
+  btn.onclick = idx >= stages.length - 1 ? restart : advance;
+}
+
+function advance() {
+  if (currentStage < stages.length - 1) {
+    currentStage++;
+    applyStage(currentStage);
+  }
+}
+
+function restart() {
+  // reset arrows immediately (no transition)
+  ['a1','a2','a3'].forEach(a => {
+    const el = document.getElementById(a);
+    el.style.transition = 'none';
+    el.style.strokeDashoffset = arrowLengths[a];
+    void el.offsetWidth;
+    el.style.transition = 'stroke-dashoffset 1s ease';
+  });
+  currentStage = 0;
+  applyStage(0);
+}
+
+// Start
+applyStage(0);
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`).classList.add('active');
+  document.getElementById('pane-anim').style.display = tab === 'anim' ? '' : 'none';
+  document.getElementById('pane-quiz').style.display = tab === 'quiz' ? '' : 'none';
+}
+
+const quizAnswers = { q1: 'C', q2: 'C', q3: 'C' };
+const quizFeedback = {
+  q1: { ok: '✅ Correct! The Balance Sheet is a snapshot on one specific date — it shows what you own and owe at that moment.', err: '❌ Not quite. The Balance Sheet is the snapshot. The Income Statement, SRE, and SCF all cover a period of time.' },
+  q2: { ok: '✅ Correct! Net Income flows into the Statement of Retained Earnings first, and then Ending Retained Earnings flows into the Balance Sheet.', err: '❌ Not quite. Net Income goes first to the Statement of Retained Earnings (not directly to the Balance Sheet).' },
+  q3: { ok: '✅ Correct! The ending Cash on the SCF must agree with the Cash line on the Balance Sheet — a key linking figure between statements.', err: '❌ Not quite. The ending Cash balance on the Statement of Cash Flows must tie to the Cash reported on the Balance Sheet.' }
+};
+
+function checkAnswers() {
+  let score = 0;
+  ['q1','q2','q3'].forEach(q => {
+    const card = document.getElementById(q);
+    const sel  = card.querySelector(`input[name="${q}"]:checked`);
+    const fb   = document.getElementById('fb' + q.slice(1));
+    const opts = card.querySelectorAll('.opt');
+    opts.forEach(o => o.classList.add('locked'));
+    if (!sel) { fb.textContent = '⚠️ Please select an answer.'; fb.className = 'q-fb err'; return; }
+    const chosen  = sel.value;
+    const correct = quizAnswers[q];
+    opts.forEach(o => {
+      const v = o.querySelector('input').value;
+      if (v === correct) o.classList.add('correct');
+      else if (v === chosen && chosen !== correct) o.classList.add('wrong');
+    });
+    if (chosen === correct) {
+      score++;
+      fb.textContent = quizFeedback[q].ok;
+      fb.className = 'q-fb ok';
+    } else {
+      fb.textContent = quizFeedback[q].err;
+      fb.className = 'q-fb err';
+    }
+  });
+  const sb = document.getElementById('score-box');
+  sb.style.display = 'block';
+  sb.textContent = score === 3
+    ? '🎉 Perfect score! 3 / 3 — You know how the four statements connect!'
+    : `Score: ${score} / 3 — Review the explanations above and try again.`;
+  document.getElementById('retry-btn').style.display = score < 3 ? '' : 'none';
+}
+
+function retryQuiz() {
+  ['q1','q2','q3'].forEach(q => {
+    const card = document.getElementById(q);
+    card.querySelectorAll('.opt').forEach(o => o.classList.remove('locked','correct','wrong'));
+    card.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);
+    const fb = document.getElementById('fb' + q.slice(1));
+    fb.textContent = '';
+    fb.className = 'q-fb';
+  });
+  document.getElementById('score-box').style.display = 'none';
+  document.getElementById('retry-btn').style.display = 'none';
+}
+
+// ── Keyboard navigation ──
+function goBack() {
+  if (currentStage > 0) {
+    // Reset any arrows whose state we're stepping past, then re-apply the previous stage.
+    ['a1','a2','a3'].forEach(a => {
+      const el = document.getElementById(a);
+      el.style.transition = 'none';
+      el.style.strokeDashoffset = arrowLengths[a];
+      void el.offsetWidth;
+      el.style.transition = 'stroke-dashoffset 1s ease';
+    });
+    currentStage--;
+    applyStage(currentStage);
+  }
+}
+
+document.addEventListener('keydown', (event) => {
+  if (event.target.matches('input, textarea, button')) return;
+  if (event.key === 'ArrowRight') advance();
+  if (event.key === 'ArrowLeft')  goBack();
+});
+</script>
+<footer style="text-align:center;color:#5c6878;font-size:0.82rem;padding:18px 12px 10px;border-top:1px solid #d7e0ea;margin-top:24px;">Reference: Horngren, <i>Financial &amp; Managerial Accounting</i> (7th ed.) — Ch&nbsp;1 · The Four Financial Statements</footer>
+</body>
+</html>
