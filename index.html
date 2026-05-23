@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Principles of Accounting Animation Hub</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  :root {
+    --ink: #172233;
+    --muted: #5d6a7a;
+    --line: #d8e1ea;
+    --paper: #f5f7fa;
+    --panel: #ffffff;
+    --green: #16806f;
+    --blue: #2f80ed;
+    --amber: #b87514;
+    --rose: #be185d;
+    --shadow: 0 14px 34px rgba(23, 34, 51, 0.10);
+  }
+
+  body {
+    min-height: 100vh;
+    font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(180deg, #f9fbfd 0%, #eef3f7 100%);
+    color: var(--ink);
+  }
+
+  a {
+    color: inherit;
+  }
+
+  .app {
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    padding: 24px 18px 36px;
+  }
+
+  header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 380px);
+    gap: 18px;
+    align-items: end;
+    margin-bottom: 18px;
+  }
+
+  .kicker {
+    color: var(--green);
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-size: clamp(1.65rem, 4vw, 2.55rem);
+    line-height: 1.05;
+    letter-spacing: 0;
+  }
+
+  .header-note {
+    color: var(--muted);
+    font-size: 0.94rem;
+    line-height: 1.5;
+  }
+
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .summary-item {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: var(--shadow);
+  }
+
+  .summary-label {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+
+  .summary-value {
+    font-size: 1.08rem;
+    font-weight: 900;
+  }
+
+  .section-title {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    margin: 20px 0 10px;
+  }
+
+  h2 {
+    font-size: 1.08rem;
+    line-height: 1.2;
+  }
+
+  .small-note {
+    color: var(--muted);
+    font-size: 0.84rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .week-card,
+  .chapter-card,
+  .optional-panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+  }
+
+  .week-card {
+    padding: 12px;
+    display: grid;
+    gap: 8px;
+    align-content: start;
+  }
+
+  .week-name {
+    color: var(--blue);
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .week-card strong {
+    font-size: 0.94rem;
+    line-height: 1.25;
+  }
+
+  .week-card span {
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.35;
+  }
+
+  .chapter-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .chapter-card {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+  }
+
+  .chapter-number {
+    width: 54px;
+    height: 54px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    color: #ffffff;
+    background: var(--green);
+    font-weight: 900;
+    font-size: 1rem;
+  }
+
+  .chapter-card:nth-child(3n + 2) .chapter-number {
+    background: var(--blue);
+  }
+
+  .chapter-card:nth-child(3n) .chapter-number {
+    background: var(--rose);
+  }
+
+  .chapter-copy {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .chapter-copy h3 {
+    font-size: 0.98rem;
+    line-height: 1.25;
+  }
+
+  .chapter-copy p {
+    color: var(--muted);
+    font-size: 0.84rem;
+    line-height: 1.35;
+  }
+
+  .time-pill {
+    justify-self: start;
+    border: 1px solid rgba(22, 128, 111, 0.25);
+    background: rgba(22, 128, 111, 0.08);
+    color: var(--green);
+    border-radius: 999px;
+    padding: 4px 8px;
+    font-size: 0.72rem;
+    font-weight: 900;
+  }
+
+  .open-link {
+    display: inline-grid;
+    place-items: center;
+    min-height: 40px;
+    padding: 0 12px;
+    border-radius: 8px;
+    background: var(--ink);
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 900;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .optional-panel {
+    padding: 14px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .optional-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .optional-link {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px;
+    background: #fbfcfe;
+    color: var(--ink);
+    text-decoration: none;
+    display: grid;
+    gap: 3px;
+  }
+
+  .optional-link strong {
+    font-size: 0.88rem;
+  }
+
+  .optional-link span {
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.3;
+  }
+
+  @media (max-width: 920px) {
+    header,
+    .chapter-grid,
+    .optional-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .week-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .app {
+      padding: 18px 10px 28px;
+    }
+
+    .summary,
+    .week-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .chapter-card {
+      grid-template-columns: 46px minmax(0, 1fr);
+    }
+
+    .chapter-number {
+      width: 42px;
+      height: 42px;
+    }
+
+    .open-link {
+      grid-column: 1 / -1;
+      width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+<main class="app">
+  <header>
+    <div>
+      <div class="kicker">Principles of Accounting</div>
+      <h1>Financial Accounting Animation Hub</h1>
+    </div>
+    <p class="header-note">
+      Use this page as the student route for the 5-week summer class. Chapter 7 is skipped, and each required chapter opens one focused animation.
+    </p>
+  </header>
+
+  <section class="summary" aria-label="Course summary">
+    <div class="summary-item">
+      <div class="summary-label">Required chapters</div>
+      <div class="summary-value">12 animations</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Skipped</div>
+      <div class="summary-value">Chapter 7</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Best use</div>
+      <div class="summary-value">Before or after lecture</div>
+    </div>
+  </section>
+
+  <div class="section-title">
+    <h2>Suggested 5-Week Route</h2>
+    <p class="small-note">A compact path for a fast summer term.</p>
+  </div>
+  <section class="week-grid" aria-label="Suggested five-week route">
+    <div class="week-card">
+      <div class="week-name">Week 1</div>
+      <strong>Chapters 1, 2, 3</strong>
+      <span>Business environment, transaction recording, adjusting entries.</span>
+    </div>
+    <div class="week-card">
+      <div class="week-name">Week 2</div>
+      <strong>Chapters 4, 5, 6</strong>
+      <span>Cycle review, merchandising, inventory cost flow.</span>
+    </div>
+    <div class="week-card">
+      <div class="week-name">Week 3</div>
+      <strong>Chapters 8, 9</strong>
+      <span>Receivables, plant assets, depletion, amortization.</span>
+    </div>
+    <div class="week-card">
+      <div class="week-name">Week 4</div>
+      <strong>Chapters 10, 11</strong>
+      <span>Investments, payroll, current liabilities.</span>
+    </div>
+    <div class="week-card">
+      <div class="week-name">Week 5</div>
+      <strong>Chapters 12, 13</strong>
+      <span>Bonds, long-term liabilities, stockholders' equity.</span>
+    </div>
+  </section>
+
+  <div class="section-title">
+    <h2>Required Animations</h2>
+    <p class="small-note">Open these in order. Most take 6-10 minutes.</p>
+  </div>
+  <section class="chapter-grid" aria-label="Required chapter animations">
+    <article class="chapter-card">
+      <div class="chapter-number">Ch 1</div>
+      <div class="chapter-copy">
+        <h3>Can This Business Survive?</h3>
+        <p>Assets = Liabilities + Equity through a coffee cart story.</p>
+        <span class="time-pill">8-10 min</span>
+      </div>
+      <a class="open-link" href="Ch01_CanThisBusinessSurvive.html">Open</a>
+    </article>
+
+    <article class="chapter-card">
+      <div class="chapter-number">Ch 2</div>
+      <div class="chapter-copy">
+        <h3>Every Transaction Has Two Sides</h3>
+        <p>Visual effects first, then debit and credit journal entry form.</p>
+        <span class="time-pill">7-9 min</span>
+      </div>
+      <a class="open-link" href="Ch02_EveryTransactionHasTwoSides%20optional.html">Open</a>
+    </article>
+
+    <article class="chapter-card">
+      <div class="chapter-number">Ch 3</div>
+      <div class="chapter-copy">
+        <h3>What Happened but Was Not Recorded Yet?</h3>
+        <p>Cash timing versus business activity in adjusting entries.</p>
+        <span class="time-pill">8-10 min</span>
+      </div>
+      <a class="open-link" href="Ch03_WhatHappenedButWasNotRecordedYet.html">Open</a>
+    </article>
+
+    <article class="chapter-card">
+      <div class="chapter-number">Ch 4</div>
+      <div class="chapter-copy">
+        <h3>Accounting Cycle Conveyor Belt</h3>
+        <p>Full accounting cycle review from transactions to closing.</p>
+        <span class="time-pill">12-15 min</span>
+      </div>
+      <a class="open-link" href="Ch04_AccountingCycleConveyorBelt.html">Open</a>
+    </article>
+
+    <article class="chapter-card">
+      <div class="chapter-number">Ch 5</div>
+      <div class="chapter-copy">
+        <h3>Life of a Hoodie in a Store</h3>
+        <p>Merchandising, inventory, sales revenue, and cost of goods sold.</p>
+        <span class="time-pill">7-9 min</span>
+      </div>
+      <a class="open-link" href="Ch05_LifeOfAHoodieInAStore.html">Open</a>
+    </article>
+
+    <article class="chapter-card">
+      <div class="chapter-number">Ch 6</div>
+      <div class="chapter-copy">
+        <h3>Which Inventory Cost Leaves First?</h3>
+        <p>FIFO, LIFO, and weighted-average cost flow choices.</p>
+        <span class="time-pill">7-9 min</span>
+      </div>
+      <a class="open-link" href="Ch06_WhichInventoryCostLeavesFirst.html">Open</a>
+    </article>
+
+    <article class="chapter-card">
+      <div class="chapter-number">Ch 8</div>
+      <div class="chapter-copy">
+        <h3>The Customer Promise</h3>
+        <p>Receivables, collections, doubtful accounts, and bad debts.</p>
+        <span class="time-pill">8-10 min</span>
+      </div>
+      <a class="open-link" href="Ch08_TheCustomerPromise.html">Open</a>
+    </article>
+
+    <article class="chapter-card">
+      <div class="chapter-number">Ch 9</div>
+      <div class="chapter-copy">
+        <h3>Different Assets, Different Ways to Use Them Up</h3>
+        <p>Depreciation, depletion, and amortization.</p>
+        <span class="time-pill">8-10 min</span>
+      </div>
+      <a class="open-link" href="Ch09_DifferentAssetsDifferentWaysToUseThemUp.html">Open</a>
+    </article>
+
+    <article class="chapter-card">
+      <div class="chapter-number">Ch 10</div>
+      <div class="chapter-copy">
+        <h3>What Does the Company Want From This Investment?</h3>
+        <p>Bonds, small stock holdings, and influential investments.</p>
+        <span class="time-pill">8-10 min</span>
+      </div>
+      <a class="open-link" href="Ch10_WhatDoesTheCompanyWantFromThisInvestment.html">Open</a>
+    </article>
+
+    <article class="chapter-card">
+      <div class="chapter-number">Ch 11</div>
+      <div class="chapter-copy">
+        <h3>Where Did My Paycheck Go?</h3>
+        <p>Gross pay, deductions, net pay, and employer payroll taxes.</p>
+        <span class="time-pill">8-10 min</span>
+      </div>
+      <a class="open-link" href="Ch11_WhereDidMyPaycheckGo.html">Open</a>
+    </article>
+
+    <article class="chapter-card">
+      <div class="chapter-number">Ch 12</div>
+      <div class="chapter-copy">
+        <h3>Bond Discount and Premium as a Seesaw</h3>
+        <p>Stated rate, market rate, discount, premium, and amortization.</p>
+        <span class="time-pill">10-12 min</span>
+      </div>
+      <a class="open-link" href="Ch12_BondDiscountAndPremiumSeesaw.html">Open</a>
+    </article>
+
+    <article class="chapter-card">
+      <div class="chapter-number">Ch 13</div>
+      <div class="chapter-copy">
+        <h3>Who Owns the Company?</h3>
+        <p>Common stock, treasury stock, dividends, and stock splits.</p>
+        <span class="time-pill">8-10 min</span>
+      </div>
+      <a class="open-link" href="Ch13_WhoOwnsTheCompany.html">Open</a>
+    </article>
+  </section>
+
+  <div class="section-title">
+    <h2>Optional Practice</h2>
+    <p class="small-note">Use these for review or alternate explanations.</p>
+  </div>
+  <section class="optional-panel" aria-label="Optional practice animations">
+    <div class="optional-grid">
+      <a class="optional-link" href="Ch01_BalanceBeam.html">
+        <strong>Ch 1: Accounting Equation Balance Beam</strong>
+        <span>Extra practice with the equation staying balanced.</span>
+      </a>
+      <a class="optional-link" href="Ch01_FourFinancialStatements.html">
+        <strong>Ch 1: Four Financial Statements</strong>
+        <span>Quick overview of the main statements.</span>
+      </a>
+      <a class="optional-link" href="Ch02_DebitCreditDance.html">
+        <strong>Ch 2: Debit and Credit Dance</strong>
+        <span>Practice which side increases each account type.</span>
+      </a>
+      <a class="optional-link" href="Ch02_TAccountFactory.html">
+        <strong>Ch 2: T-Account Factory</strong>
+        <span>Move transactions into T-accounts.</span>
+      </a>
+      <a class="optional-link" href="Ch02_JournalToLedgerMail.html">
+        <strong>Ch 2: Journal to Ledger Mail System</strong>
+        <span>See journal entries posted into ledger accounts.</span>
+      </a>
+      <a class="optional-link" href="animation-ideas.html">
+        <strong>Instructor Planning: Animation Ideas</strong>
+        <span>Planning notes, not required student work.</span>
+      </a>
+    </div>
+  </section>
+</main>
+</body>
+</html>

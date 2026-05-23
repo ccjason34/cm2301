@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Which Inventory Cost Leaves First?</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  :root {
+    --bg: #f4f7fb;
+    --panel: #ffffff;
+    --ink: #172233;
+    --muted: #5c6878;
+    --line: #d7e0ea;
+    --teal: #16806f;
+    --blue: #2f80ed;
+    --amber: #c47a15;
+    --red: #bd4332;
+    --green: #198754;
+    --purple: #7057d4;
+    --shadow: 0 16px 34px rgba(23, 34, 51, 0.12);
+  }
+
+  body {
+    min-height: 100vh;
+    font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(180deg, #f8fafc 0%, #edf3f7 100%);
+    color: var(--ink);
+  }
+
+  button {
+    font: inherit;
+  }
+
+  .app {
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    padding: 24px 18px 34px;
+  }
+
+  header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .kicker {
+    color: var(--teal);
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-size: clamp(1.55rem, 4vw, 2.45rem);
+    line-height: 1.06;
+    letter-spacing: 0;
+  }
+
+  .header-note {
+    width: min(480px, 100%);
+    color: var(--muted);
+    font-size: 0.94rem;
+    line-height: 1.45;
+  }
+
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+    gap: 14px;
+    align-items: start;
+  }
+
+  .scene-panel,
+  .logic-panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+  }
+
+  .scene-panel {
+    min-height: 670px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    overflow: hidden;
+  }
+
+  .story-band {
+    padding: 18px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(90deg, #ffffff 0%, #f3fbf8 100%);
+  }
+
+  .step-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--teal);
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+
+  .step-count::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--teal);
+    box-shadow: 0 0 0 5px rgba(22, 128, 111, 0.12);
+  }
+
+  #storyTitle {
+    font-size: 1.24rem;
+    line-height: 1.2;
+    margin-bottom: 7px;
+  }
+
+  #storyText {
+    min-height: 44px;
+    color: var(--muted);
+    font-size: 0.94rem;
+    line-height: 1.48;
+    max-width: 720px;
+  }
+
+  .inventory-scene {
+    position: relative;
+    min-height: 390px;
+    background:
+      linear-gradient(180deg, #e8f2fb 0%, #f8fbff 58%, #e2eadf 59%, #dae4d9 100%);
+    overflow: hidden;
+  }
+
+  .shelf {
+    position: absolute;
+    left: 8%;
+    right: 30%;
+    bottom: 120px;
+    height: 20px;
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    background: #c79b5b;
+  }
+
+  .shelf::before {
+    content: "Inventory shelf";
+    position: absolute;
+    left: 0;
+    top: -42px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 6px 10px;
+    color: var(--muted);
+    font-size: 0.76rem;
+    font-weight: 900;
+  }
+
+  .sale-zone {
+    position: absolute;
+    right: 6%;
+    bottom: 92px;
+    width: 148px;
+    min-height: 170px;
+    border: 3px dashed var(--teal);
+    border-radius: 8px;
+    background: rgba(22, 128, 111, 0.06);
+    display: grid;
+    align-content: end;
+    justify-items: center;
+    padding: 12px;
+  }
+
+  .sale-zone-label {
+    color: var(--teal);
+    font-size: 0.78rem;
+    font-weight: 900;
+    text-align: center;
+    line-height: 1.25;
+  }
+
+  .box {
+    position: absolute;
+    bottom: 142px;
+    width: 104px;
+    height: 94px;
+    border: 3px solid var(--ink);
+    border-radius: 8px;
+    background: #fff;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 5px;
+    transition: left 520ms ease, bottom 520ms ease, transform 520ms ease, background 220ms ease, opacity 220ms ease;
+    z-index: 4;
+    box-shadow: 0 12px 18px rgba(23, 34, 51, 0.14);
+  }
+
+  .box::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 18px;
+    border-top: 3px solid rgba(23, 34, 51, 0.18);
+  }
+
+  .box-1 {
+    left: 12%;
+    background: #f0f7ff;
+  }
+
+  .box-2 {
+    left: 31%;
+    background: #fff8ec;
+  }
+
+  .box-3 {
+    left: 50%;
+    background: #f1ecff;
+  }
+
+  .box-name {
+    color: var(--muted);
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .box-cost {
+    font-size: 1.42rem;
+    font-weight: 900;
+  }
+
+  .box-age {
+    color: var(--muted);
+    font-size: 0.76rem;
+    font-weight: 850;
+  }
+
+  .method-fifo .box-1 {
+    left: calc(100% - 170px);
+    bottom: 156px;
+    transform: rotate(4deg);
+    background: #e9f8f4;
+  }
+
+  .method-lifo .box-3 {
+    left: calc(100% - 170px);
+    bottom: 156px;
+    transform: rotate(-4deg);
+    background: #e9f8f4;
+  }
+
+  .method-average .box {
+    opacity: 0.7;
+  }
+
+  .method-average .box-2 {
+    transform: translateY(-16px);
+    opacity: 1;
+    background: #e9f8f4;
+  }
+
+  .average-token {
+    position: absolute;
+    right: 8%;
+    top: 95px;
+    min-width: 126px;
+    border-radius: 8px;
+    background: var(--teal);
+    color: #fff;
+    padding: 12px;
+    display: grid;
+    gap: 3px;
+    justify-items: center;
+    font-weight: 900;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 240ms ease, transform 240ms ease;
+    z-index: 7;
+    box-shadow: 0 14px 24px rgba(22, 128, 111, 0.22);
+  }
+
+  .method-average .average-token {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .average-token span:first-child {
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .average-token span:last-child {
+    font-size: 1.3rem;
+  }
+
+  .formula-panel {
+    position: absolute;
+    left: 8%;
+    right: 6%;
+    bottom: 18px;
+    min-height: 68px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 12px;
+    display: grid;
+    gap: 5px;
+  }
+
+  .formula-title {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .formula-text {
+    font-size: 0.95rem;
+    font-weight: 900;
+    line-height: 1.3;
+  }
+
+  .concept-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 14px;
+    border-top: 1px solid var(--line);
+    background: #fff;
+  }
+
+  .concept-card {
+    min-height: 108px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #f9fbfd;
+    padding: 13px;
+    display: grid;
+    gap: 7px;
+    align-content: start;
+  }
+
+  .concept-title {
+    font-size: 0.76rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .concept-main {
+    font-size: 1.04rem;
+    line-height: 1.22;
+    font-weight: 900;
+  }
+
+  .concept-note {
+    color: var(--muted);
+    font-size: 0.84rem;
+    line-height: 1.35;
+    font-weight: 750;
+  }
+
+  .logic-panel {
+    min-height: 670px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .panel-title h2 {
+    font-size: 1.02rem;
+    line-height: 1.2;
+  }
+
+  .active-pill {
+    border-radius: 999px;
+    background: rgba(47, 128, 237, 0.1);
+    border: 1px solid rgba(47, 128, 237, 0.35);
+    color: var(--blue);
+    padding: 7px 10px;
+    font-size: 0.74rem;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  .tab-instruction {
+    color: var(--ink);
+    font-size: 0.86rem;
+    font-weight: 900;
+    line-height: 1.25;
+  }
+
+  .method-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .method-tab {
+    min-height: 62px;
+    border: 2px solid #9ab4d4;
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--ink);
+    padding: 9px 11px;
+    cursor: pointer;
+    text-align: left;
+    font-weight: 900;
+    line-height: 1.16;
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 16px rgba(23, 34, 51, 0.08);
+    transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 120ms ease;
+  }
+
+  .method-tab:hover {
+    transform: translateY(-1px);
+    border-color: var(--teal);
+  }
+
+  .method-tab.active {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(22, 128, 111, 0.24);
+  }
+
+  .method-tab.summary-tab {
+    grid-column: 1 / -1;
+  }
+
+  .tab-number {
+    width: 38px;
+    height: 32px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: var(--blue);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 900;
+  }
+
+  .method-tab.active .tab-number {
+    background: #fff;
+    color: var(--teal);
+  }
+
+  .tab-copy {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .tab-main {
+    font-size: 0.88rem;
+    overflow-wrap: anywhere;
+  }
+
+  .tab-sub {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+  }
+
+  .method-tab.active .tab-sub {
+    color: rgba(255, 255, 255, 0.86);
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 104px minmax(150px, 1fr) 88px;
+    gap: 8px;
+  }
+
+  .btn {
+    min-height: 46px;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    padding: 10px 12px;
+    font-size: 0.88rem;
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .btn:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+  }
+
+  .btn-muted {
+    background: #6b7788;
+  }
+
+  .btn-main {
+    background: var(--teal);
+  }
+
+  .btn-reset {
+    background: var(--amber);
+  }
+
+  .focus-card,
+  .quiz-card,
+  .result-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #f9fbfd;
+    padding: 14px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .focus-kicker,
+  .quiz-kicker {
+    color: var(--teal);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .focus-title {
+    font-size: 1.18rem;
+    line-height: 1.2;
+    font-weight: 900;
+  }
+
+  .focus-text {
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.42;
+    font-weight: 750;
+  }
+
+  .answer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .answer-btn {
+    min-height: 50px;
+    border: 2px solid #9ab4d4;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+    font-weight: 900;
+    font-size: 1rem;
+  }
+
+  .answer-btn:hover {
+    border-color: var(--teal);
+  }
+
+  .answer-btn.selected.correct {
+    border-color: var(--green);
+    background: #eef8f5;
+    color: var(--green);
+  }
+
+  .answer-btn.selected.incorrect {
+    border-color: var(--red);
+    background: #fff3f0;
+    color: var(--red);
+  }
+
+  .feedback {
+    min-height: 44px;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-weight: 850;
+    line-height: 1.35;
+  }
+
+  .feedback.correct {
+    background: #eef8f5;
+    border-color: rgba(25, 135, 84, 0.3);
+    color: var(--green);
+  }
+
+  .feedback.incorrect {
+    background: #fff3f0;
+    border-color: rgba(189, 67, 50, 0.3);
+    color: var(--red);
+  }
+
+  .result-grid {
+    display: grid;
+    gap: 9px;
+  }
+
+  .result-row {
+    min-height: 42px;
+    display: grid;
+    grid-template-columns: 118px minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+    border: 1px solid #e1e8f0;
+    border-radius: 8px;
+    background: #fff;
+    padding: 9px 10px;
+  }
+
+  .result-label {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .result-value {
+    font-weight: 900;
+    line-height: 1.25;
+  }
+
+  @media (max-width: 980px) {
+    .stage {
+      grid-template-columns: 1fr;
+    }
+
+    .scene-panel,
+    .logic-panel {
+      min-height: 0;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .app {
+      padding: 18px 10px 28px;
+    }
+
+    .method-tabs,
+    .concept-strip,
+    .answer-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .controls {
+      grid-template-columns: 1fr;
+    }
+
+    .box {
+      width: 82px;
+      height: 80px;
+    }
+
+    .box-1 {
+      left: 8%;
+    }
+
+    .box-2 {
+      left: 32%;
+    }
+
+    .box-3 {
+      left: 56%;
+    }
+  }
+</style>
+</head>
+<body>
+<main class="app">
+  <header>
+    <div>
+      <div class="kicker">Ch 6 · Inventory Costing — FIFO, LIFO, Weighted-Average</div>
+      <h1>Which Inventory Cost Leaves First?</h1>
+    </div>
+    <p class="header-note">When inventory items have different costs, the cost flow method decides which cost is assigned to Cost of Goods Sold.</p>
+  </header>
+
+  <section class="stage">
+    <section class="scene-panel" aria-label="Inventory cost flow animation">
+      <div class="story-band">
+        <div class="step-count" id="stepCount">Start Here</div>
+        <h2 id="storyTitle">Three boxes, three different costs</h2>
+        <p id="storyText">The store has three identical items in inventory. One item is sold. Which cost goes to Cost of Goods Sold?</p>
+      </div>
+
+      <div class="inventory-scene method-summary" id="inventoryScene">
+        <div class="shelf"></div>
+        <div class="sale-zone">
+          <div class="sale-zone-label">One item sold<br />Cost assigned to COGS</div>
+        </div>
+
+        <div class="box box-1">
+          <div class="box-name">Box 1</div>
+          <div class="box-cost">$10</div>
+          <div class="box-age">Oldest</div>
+        </div>
+
+        <div class="box box-2">
+          <div class="box-name">Box 2</div>
+          <div class="box-cost">$12</div>
+          <div class="box-age">Middle</div>
+        </div>
+
+        <div class="box box-3">
+          <div class="box-name">Box 3</div>
+          <div class="box-cost">$15</div>
+          <div class="box-age">Newest</div>
+        </div>
+
+        <div class="average-token">
+          <span>Average cost</span>
+          <span>$12.33</span>
+        </div>
+
+        <div class="formula-panel">
+          <div class="formula-title" id="formulaTitle">Cost flow question</div>
+          <div class="formula-text" id="formulaText">One item is sold. Choose the cost assigned to Cost of Goods Sold.</div>
+        </div>
+      </div>
+
+      <div class="concept-strip">
+        <div class="concept-card">
+          <div class="concept-title">Physical item</div>
+          <div class="concept-main">One box leaves the store</div>
+          <div class="concept-note">The actual item sold can be any identical box.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-title">Cost flow</div>
+          <div class="concept-main">Accounting chooses the cost</div>
+          <div class="concept-note">FIFO, LIFO, and weighted average assign different costs to COGS.</div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="logic-panel">
+      <div class="panel-title">
+        <h2>Cost Flow Method</h2>
+        <span class="active-pill" id="activePill">Start Here</span>
+      </div>
+
+      <div class="tab-instruction">Pick a method below. Watch which cost moves to Cost of Goods Sold and which stays in Ending Inventory — the numbers change with each method.</div>
+      <div class="method-tabs" id="methodTabs"></div>
+
+      <div class="controls">
+        <button class="btn btn-muted" type="button" id="prevBtn">Previous</button>
+        <button class="btn btn-main" type="button" id="nextBtn">Next Method</button>
+        <button class="btn btn-reset" type="button" id="resetBtn">Reset</button>
+      </div>
+
+      <div class="focus-card">
+        <div class="focus-kicker" id="focusKicker">Start here</div>
+        <div class="focus-title" id="focusTitle">One item is sold</div>
+        <p class="focus-text" id="focusText">The question is not which physical box left. The question is which cost is assigned to Cost of Goods Sold.</p>
+      </div>
+
+      <div class="quiz-card" id="quizCard"></div>
+
+      <div class="result-card">
+        <div class="quiz-kicker">Accounting result</div>
+        <div class="result-grid" id="resultGrid"></div>
+      </div>
+    </aside>
+  </section>
+</main>
+
+<script>
+  const methods = [
+    {
+      id: "summary",
+      tab: "Start Here",
+      tabSub: "Inventory layers",
+      storyTitle: "Three boxes, three different costs",
+      storyText: "The store has three identical items in inventory. One item is sold. Which cost goes to Cost of Goods Sold?",
+      focusKicker: "Start here",
+      focusTitle: "One item is sold",
+      focusText: "The question is not which physical box left. The question is which cost is assigned to Cost of Goods Sold.",
+      formulaTitle: "Cost flow question",
+      formulaText: "One item is sold. Choose the cost assigned to Cost of Goods Sold.",
+      sceneClass: "method-summary",
+      result: [
+        ["Goods available", "$10 + $12 + $15 = $37"],
+        ["Units available", "3 units"],
+        ["Question", "Which cost leaves inventory first?"]
+      ]
+    },
+    {
+      id: "fifo",
+      tab: "FIFO",
+      tabSub: "Oldest cost first",
+      storyTitle: "FIFO selects the oldest cost",
+      storyText: "FIFO means First-In, First-Out. When one item is sold, the oldest inventory cost is assigned to Cost of Goods Sold.",
+      focusKicker: "FIFO",
+      focusTitle: "First cost leaves first",
+      focusText: "Box 1 is the oldest layer. Under FIFO, the cost assigned to Cost of Goods Sold is $10.",
+      formulaTitle: "FIFO formula",
+      formulaText: "Oldest cost leaves first: Box 1 -> COGS $10.",
+      sceneClass: "method-fifo",
+      correct: "$10",
+      result: [
+        ["COGS", "$10"],
+        ["Ending inventory", "$12 + $15 = $27"],
+        ["Reason", "The oldest cost leaves first."]
+      ]
+    },
+    {
+      id: "lifo",
+      tab: "LIFO",
+      tabSub: "Newest cost first",
+      storyTitle: "LIFO selects the newest cost",
+      storyText: "LIFO means Last-In, First-Out. When one item is sold, the newest inventory cost is assigned to Cost of Goods Sold.",
+      focusKicker: "LIFO",
+      focusTitle: "Last cost leaves first",
+      focusText: "Box 3 is the newest layer. Under LIFO, the cost assigned to Cost of Goods Sold is $15.",
+      formulaTitle: "LIFO formula",
+      formulaText: "Newest cost leaves first: Box 3 -> COGS $15.",
+      sceneClass: "method-lifo",
+      correct: "$15",
+      result: [
+        ["COGS", "$15"],
+        ["Ending inventory", "$10 + $12 = $22"],
+        ["Reason", "The newest cost leaves first."]
+      ]
+    },
+    {
+      id: "average",
+      tab: "Weighted avg.",
+      tabSub: "Blend the costs",
+      storyTitle: "Weighted average blends the costs",
+      storyText: "Weighted average does not choose the oldest or newest box. It calculates one average cost for the identical units.",
+      focusKicker: "Weighted average",
+      focusTitle: "Use the average cost per unit",
+      focusText: "The average cost is ($10 + $12 + $15) / 3 = $12.33, rounded to cents.",
+      formulaTitle: "Weighted average formula",
+      formulaText: "($10 + $12 + $15) / 3 units = $12.33 per unit.",
+      sceneClass: "method-average",
+      correct: "$12.33",
+      result: [
+        ["COGS", "$12.33"],
+        ["Ending inventory", "$37 - $12.33 = $24.67"],
+        ["Reason", "The costs are blended into one average."]
+      ]
+    }
+  ];
+
+  const choices = ["$10", "$12", "$15", "$12.33"];
+  let activeIndex = 0;
+  let selectedChoice = "";
+
+  const el = {
+    stepCount: document.getElementById("stepCount"),
+    storyTitle: document.getElementById("storyTitle"),
+    storyText: document.getElementById("storyText"),
+    inventoryScene: document.getElementById("inventoryScene"),
+    formulaTitle: document.getElementById("formulaTitle"),
+    formulaText: document.getElementById("formulaText"),
+    activePill: document.getElementById("activePill"),
+    methodTabs: document.getElementById("methodTabs"),
+    prevBtn: document.getElementById("prevBtn"),
+    nextBtn: document.getElementById("nextBtn"),
+    resetBtn: document.getElementById("resetBtn"),
+    focusKicker: document.getElementById("focusKicker"),
+    focusTitle: document.getElementById("focusTitle"),
+    focusText: document.getElementById("focusText"),
+    quizCard: document.getElementById("quizCard"),
+    resultGrid: document.getElementById("resultGrid")
+  };
+
+  function renderTabs() {
+    el.methodTabs.innerHTML = "";
+
+    methods.forEach((method, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "method-tab" + (method.id === "summary" ? " summary-tab" : "");
+      button.classList.toggle("active", index === activeIndex);
+      button.setAttribute("aria-pressed", index === activeIndex ? "true" : "false");
+      button.innerHTML = `
+        <span class="tab-number">${index + 1}</span>
+        <span class="tab-copy">
+          <span class="tab-main">${method.tab}</span>
+          <span class="tab-sub">${method.tabSub}</span>
+        </span>
+      `;
+      button.addEventListener("click", () => {
+        activeIndex = index;
+        selectedChoice = "";
+        render();
+      });
+      el.methodTabs.appendChild(button);
+    });
+  }
+
+  function renderQuiz(method) {
+    if (!method.correct) {
+      el.quizCard.innerHTML = `
+        <div class="quiz-kicker">Pause question</div>
+        <div class="focus-title">What changes when one item is sold?</div>
+        <p class="focus-text">Cost of Goods Sold increases, and Inventory decreases. The method decides which cost amount is used.</p>
+      `;
+      return;
+    }
+
+    const buttons = choices.map((choice) => {
+      const status = selectedChoice === choice
+        ? (choice === method.correct ? " selected correct" : " selected incorrect")
+        : "";
+      return `<button class="answer-btn${status}" type="button" data-choice="${choice}">${choice}</button>`;
+    }).join("");
+
+    const feedbackClass = selectedChoice
+      ? (selectedChoice === method.correct ? " correct" : " incorrect")
+      : "";
+    const feedbackText = selectedChoice
+      ? (selectedChoice === method.correct
+        ? "Correct. " + method.result[2][1]
+        : "Try again. This method assigns " + method.correct + " to Cost of Goods Sold.")
+      : "Pause here and ask: Which cost should be assigned to Cost of Goods Sold?";
+
+    el.quizCard.innerHTML = `
+      <div class="quiz-kicker">Student choice</div>
+      <div class="focus-title">Which cost goes to Cost of Goods Sold?</div>
+      <div class="answer-grid">${buttons}</div>
+      <div class="feedback${feedbackClass}">${feedbackText}</div>
+    `;
+
+    el.quizCard.querySelectorAll(".answer-btn").forEach((button) => {
+      button.addEventListener("click", () => {
+        selectedChoice = button.dataset.choice;
+        render();
+      });
+    });
+  }
+
+  function renderResult(method) {
+    el.resultGrid.innerHTML = method.result.map((row) => `
+      <div class="result-row">
+        <div class="result-label">${row[0]}</div>
+        <div class="result-value">${row[1]}</div>
+      </div>
+    `).join("");
+  }
+
+  function render() {
+    const method = methods[activeIndex];
+    const countText = activeIndex === 0 ? "Start Here" : "Method " + activeIndex + " of 3";
+
+    el.stepCount.textContent = countText;
+    el.storyTitle.textContent = method.storyTitle;
+    el.storyText.textContent = method.storyText;
+    el.inventoryScene.className = "inventory-scene " + method.sceneClass;
+    el.formulaTitle.textContent = method.formulaTitle;
+    el.formulaText.textContent = method.formulaText;
+    el.activePill.textContent = countText;
+    el.focusKicker.textContent = method.focusKicker;
+    el.focusTitle.textContent = method.focusTitle;
+    el.focusText.textContent = method.focusText;
+    el.prevBtn.disabled = activeIndex === 0;
+    el.nextBtn.textContent = activeIndex === methods.length - 1 ? "Start Again" : "Next Method";
+
+    renderTabs();
+    renderQuiz(method);
+    renderResult(method);
+  }
+
+  function goPrevious() {
+    activeIndex = Math.max(0, activeIndex - 1);
+    selectedChoice = "";
+    render();
+  }
+
+  function goNext() {
+    activeIndex = activeIndex === methods.length - 1 ? 0 : activeIndex + 1;
+    selectedChoice = "";
+    render();
+  }
+
+  el.prevBtn.addEventListener("click", goPrevious);
+  el.nextBtn.addEventListener("click", goNext);
+  el.resetBtn.addEventListener("click", () => {
+    activeIndex = 0;
+    selectedChoice = "";
+    render();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    const tag = event.target.tagName;
+    const isTyping = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+
+    if (isTyping || event.altKey || event.ctrlKey || event.metaKey) {
+      return;
+    }
+
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      goPrevious();
+    }
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      goNext();
+    }
+  });
+
+  render();
+</script>
+<footer style="text-align:center;color:#5c6878;font-size:0.82rem;padding:18px 12px 10px;border-top:1px solid #d7e0ea;margin-top:24px;">Reference: Horngren, <i>Financial &amp; Managerial Accounting</i> (7th ed.) — Ch&nbsp;6 · Inventory Costing — FIFO, LIFO, Weighted-Average</footer>
+</body>
+</html>

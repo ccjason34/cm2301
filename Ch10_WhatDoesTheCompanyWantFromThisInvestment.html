@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>What Does the Company Want From This Investment?</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  :root {
+    --bg: #f4f7fb;
+    --panel: #ffffff;
+    --ink: #172233;
+    --muted: #5c6878;
+    --line: #d7e0ea;
+    --teal: #16806f;
+    --blue: #2f80ed;
+    --amber: #c47a15;
+    --red: #bd4332;
+    --green: #198754;
+    --purple: #7057d4;
+    --shadow: 0 16px 34px rgba(23, 34, 51, 0.12);
+  }
+
+  body {
+    min-height: 100vh;
+    font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(180deg, #f8fafc 0%, #edf3f7 100%);
+    color: var(--ink);
+  }
+
+  button {
+    font: inherit;
+  }
+
+  .app {
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    padding: 24px 18px 34px;
+  }
+
+  header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .kicker {
+    color: var(--teal);
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-size: clamp(1.55rem, 4vw, 2.45rem);
+    line-height: 1.06;
+    letter-spacing: 0;
+  }
+
+  .header-note {
+    width: min(520px, 100%);
+    color: var(--muted);
+    font-size: 0.94rem;
+    line-height: 1.45;
+  }
+
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+    gap: 14px;
+    align-items: start;
+  }
+
+  .story-panel,
+  .accounting-panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+  }
+
+  .story-panel {
+    min-height: 700px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    overflow: hidden;
+  }
+
+  .story-band {
+    padding: 18px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(90deg, #ffffff 0%, #f3fbf8 100%);
+  }
+
+  .step-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--teal);
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+
+  .step-count::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--teal);
+    box-shadow: 0 0 0 5px rgba(22, 128, 111, 0.12);
+  }
+
+  #storyTitle {
+    font-size: 1.24rem;
+    line-height: 1.2;
+    margin-bottom: 7px;
+  }
+
+  #storyText {
+    min-height: 44px;
+    color: var(--muted);
+    font-size: 0.94rem;
+    line-height: 1.48;
+    max-width: 720px;
+  }
+
+  .investment-scene {
+    position: relative;
+    min-height: 430px;
+    background:
+      linear-gradient(180deg, #e8f2fb 0%, #f8fbff 56%, #e2eadf 57%, #dae4d9 100%);
+    overflow: hidden;
+  }
+
+  .cash-base {
+    position: absolute;
+    left: 7%;
+    top: 26px;
+    width: 172px;
+    min-height: 118px;
+    border: 3px solid var(--ink);
+    border-radius: 8px;
+    background: #ffffff;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 6px;
+    z-index: 6;
+    box-shadow: 0 12px 20px rgba(23, 34, 51, 0.12);
+  }
+
+  .cash-label {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .cash-amount {
+    color: var(--green);
+    font-size: 1.46rem;
+    font-weight: 900;
+  }
+
+  .cash-token {
+    position: absolute;
+    left: calc(7% + 58px);
+    top: 148px;
+    width: 58px;
+    height: 58px;
+    border: 3px solid var(--ink);
+    border-radius: 50%;
+    background: #f0d67a;
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+    z-index: 10;
+    transition: left 520ms ease, top 520ms ease, transform 520ms ease;
+    box-shadow: 0 10px 16px rgba(23, 34, 51, 0.18);
+  }
+
+  .choice-lane {
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    bottom: 102px;
+    min-height: 226px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    align-items: stretch;
+  }
+
+  .investment-card {
+    position: relative;
+    min-height: 226px;
+    border: 1px solid rgba(215, 224, 234, 0.9);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.78);
+    padding: 14px;
+    display: grid;
+    align-content: end;
+    justify-items: center;
+    gap: 12px;
+    transition: transform 220ms ease, border-color 220ms ease, background 220ms ease;
+  }
+
+  .investment-card.active {
+    transform: translateY(-6px);
+    border-color: rgba(22, 128, 111, 0.55);
+    background: rgba(233, 248, 244, 0.92);
+  }
+
+  .card-copy {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    top: 12px;
+    display: grid;
+    gap: 3px;
+  }
+
+  .card-title {
+    font-size: 0.9rem;
+    line-height: 1.12;
+    font-weight: 900;
+  }
+
+  .card-subtitle {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .bond-paper {
+    width: 140px;
+    height: 116px;
+    border: 3px solid var(--ink);
+    border-radius: 8px;
+    background: #fff8ec;
+    padding: 16px 12px;
+    display: grid;
+    gap: 8px;
+    align-content: start;
+    box-shadow: 0 10px 15px rgba(23, 34, 51, 0.12);
+  }
+
+  .bond-paper::before {
+    content: "BOND";
+    color: var(--amber);
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-align: center;
+  }
+
+  .paper-line {
+    height: 8px;
+    border-radius: 999px;
+    background: #e0d6c2;
+  }
+
+  .coupon {
+    justify-self: center;
+    border: 2px dashed var(--amber);
+    border-radius: 999px;
+    color: var(--amber);
+    padding: 5px 10px;
+    font-size: 0.76rem;
+    font-weight: 900;
+  }
+
+  .stock-paper {
+    width: 140px;
+    height: 116px;
+    border: 3px solid var(--ink);
+    border-radius: 8px;
+    background: #f0f7ff;
+    padding: 14px;
+    display: grid;
+    align-content: end;
+    gap: 8px;
+    box-shadow: 0 10px 15px rgba(23, 34, 51, 0.12);
+  }
+
+  .stock-bars {
+    height: 62px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    align-items: end;
+  }
+
+  .stock-bars span {
+    border: 2px solid var(--ink);
+    border-radius: 5px 5px 0 0;
+    background: var(--blue);
+  }
+
+  .stock-bars span:nth-child(1) {
+    height: 32px;
+  }
+
+  .stock-bars span:nth-child(2) {
+    height: 46px;
+  }
+
+  .stock-bars span:nth-child(3) {
+    height: 38px;
+  }
+
+  .stock-bars span:nth-child(4) {
+    height: 58px;
+  }
+
+  .dividend-chip {
+    justify-self: center;
+    border-radius: 999px;
+    background: var(--green);
+    color: #fff;
+    padding: 5px 10px;
+    font-size: 0.76rem;
+    font-weight: 900;
+  }
+
+  .influence-graphic {
+    position: relative;
+    width: 156px;
+    height: 132px;
+  }
+
+  .company-node {
+    position: absolute;
+    width: 72px;
+    height: 72px;
+    border: 3px solid var(--ink);
+    border-radius: 8px;
+    background: #ffffff;
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+    box-shadow: 0 10px 15px rgba(23, 34, 51, 0.12);
+  }
+
+  .company-node.left {
+    left: 0;
+    top: 36px;
+    background: #f1ecff;
+    color: var(--purple);
+  }
+
+  .company-node.right {
+    right: 0;
+    top: 36px;
+    background: #e9f8f4;
+    color: var(--teal);
+  }
+
+  .influence-line {
+    position: absolute;
+    left: 63px;
+    right: 63px;
+    top: 68px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--purple);
+  }
+
+  .percent-badge {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    min-width: 74px;
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    background: #ffffff;
+    padding: 7px 10px;
+    text-align: center;
+    font-weight: 900;
+  }
+
+  .return-bubble {
+    position: absolute;
+    right: 7%;
+    top: 36px;
+    width: 214px;
+    min-height: 100px;
+    border: 3px solid var(--ink);
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 13px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 240ms ease, transform 240ms ease;
+    z-index: 8;
+    box-shadow: 0 12px 20px rgba(23, 34, 51, 0.12);
+  }
+
+  .return-kicker {
+    color: var(--teal);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .return-main {
+    font-size: 1.08rem;
+    line-height: 1.22;
+    font-weight: 900;
+  }
+
+  .purpose-card {
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    bottom: 18px;
+    min-height: 72px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 12px 14px;
+    display: grid;
+    gap: 6px;
+    z-index: 5;
+  }
+
+  .purpose-kicker {
+    color: var(--teal);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .purpose-text {
+    font-size: 1rem;
+    line-height: 1.3;
+    font-weight: 900;
+  }
+
+  .method-bonds .cash-token {
+    left: 21%;
+    top: 242px;
+    transform: rotate(18deg);
+  }
+
+  .method-small-stock .cash-token {
+    left: 48%;
+    top: 242px;
+    transform: rotate(-10deg);
+  }
+
+  .method-influence .cash-token {
+    left: 74%;
+    top: 242px;
+    transform: rotate(12deg);
+  }
+
+  .method-overview .return-bubble,
+  .method-bonds .return-bubble,
+  .method-small-stock .return-bubble,
+  .method-influence .return-bubble,
+  .method-summary .return-bubble {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .method-bonds .bond-card .coupon {
+    animation: pulse 1.3s ease-in-out infinite;
+  }
+
+  .method-small-stock .stock-bars span {
+    animation: barLift 1.6s ease-in-out infinite;
+  }
+
+  .method-small-stock .stock-bars span:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+
+  .method-small-stock .stock-bars span:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  .method-small-stock .stock-bars span:nth-child(4) {
+    animation-delay: 0.45s;
+  }
+
+  .method-influence .influence-line {
+    animation: influenceFlow 1.3s ease-in-out infinite;
+  }
+
+  .compare-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 14px;
+    border-top: 1px solid var(--line);
+    background: #fff;
+  }
+
+  .compare-card {
+    min-height: 112px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #f9fbfd;
+    padding: 13px;
+    display: grid;
+    gap: 7px;
+    align-content: start;
+  }
+
+  .compare-title {
+    font-size: 0.76rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .compare-main {
+    font-size: 1.02rem;
+    line-height: 1.22;
+    font-weight: 900;
+  }
+
+  .compare-note {
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.35;
+    font-weight: 750;
+  }
+
+  .accounting-panel {
+    min-height: 700px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .panel-title h2 {
+    font-size: 1.02rem;
+    line-height: 1.2;
+  }
+
+  .active-pill {
+    border-radius: 999px;
+    background: rgba(47, 128, 237, 0.1);
+    border: 1px solid rgba(47, 128, 237, 0.35);
+    color: var(--blue);
+    padding: 7px 10px;
+    font-size: 0.74rem;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  .tab-instruction {
+    color: var(--ink);
+    font-size: 0.86rem;
+    font-weight: 900;
+    line-height: 1.25;
+  }
+
+  .investment-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .investment-tab {
+    min-height: 62px;
+    border: 2px solid #9ab4d4;
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--ink);
+    padding: 9px 11px;
+    cursor: pointer;
+    text-align: left;
+    font-weight: 900;
+    line-height: 1.16;
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 16px rgba(23, 34, 51, 0.08);
+    transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 120ms ease;
+  }
+
+  .investment-tab:hover {
+    transform: translateY(-1px);
+    border-color: var(--teal);
+  }
+
+  .investment-tab.active {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(22, 128, 111, 0.24);
+  }
+
+  .tab-number {
+    width: 38px;
+    height: 32px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: var(--blue);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 900;
+  }
+
+  .investment-tab.active .tab-number {
+    background: #fff;
+    color: var(--teal);
+  }
+
+  .tab-copy {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .tab-main {
+    font-size: 0.88rem;
+    overflow-wrap: anywhere;
+  }
+
+  .tab-sub {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+  }
+
+  .investment-tab.active .tab-sub {
+    color: rgba(255, 255, 255, 0.86);
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 104px minmax(150px, 1fr) 88px;
+    gap: 8px;
+  }
+
+  .btn {
+    min-height: 46px;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    padding: 10px 12px;
+    font-size: 0.88rem;
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .btn:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+  }
+
+  .btn-muted {
+    background: #6b7788;
+  }
+
+  .btn-main {
+    background: var(--teal);
+  }
+
+  .btn-reset {
+    background: var(--amber);
+  }
+
+  .focus-card,
+  .example-card,
+  .quiz-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #f9fbfd;
+    padding: 14px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .focus-kicker,
+  .example-kicker,
+  .quiz-kicker {
+    color: var(--teal);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .focus-title {
+    font-size: 1.18rem;
+    line-height: 1.2;
+    font-weight: 900;
+  }
+
+  .focus-text {
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.42;
+    font-weight: 750;
+  }
+
+  .exam-clue {
+    border: 2px solid var(--amber);
+    border-left: 5px solid var(--amber);
+    border-radius: 8px;
+    background: #fff8ec;
+    padding: 9px 12px;
+    color: #7a4a10;
+    font-size: 0.86rem;
+    font-weight: 850;
+    line-height: 1.38;
+    display: flex;
+    gap: 9px;
+    align-items: start;
+  }
+
+  .exam-clue::before {
+    content: "⚠️";
+    font-size: 1.05rem;
+    flex-shrink: 0;
+  }
+
+  .exam-clue[hidden] {
+    display: none;
+  }
+
+  .example-title {
+    font-size: 1.04rem;
+    line-height: 1.25;
+    font-weight: 900;
+  }
+
+  .formula-box {
+    border: 1px solid #e1e8f0;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 10px 12px;
+    display: grid;
+    gap: 5px;
+  }
+
+  .formula-label {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .formula-text {
+    font-weight: 900;
+    line-height: 1.32;
+  }
+
+  .journal-table {
+    display: grid;
+    gap: 7px;
+  }
+
+  .journal-row {
+    min-height: 38px;
+    display: grid;
+    gap: 8px;
+    align-items: center;
+    border: 1px solid #e1e8f0;
+    border-radius: 8px;
+    background: #fff;
+    padding: 8px 10px;
+    font-weight: 900;
+  }
+
+  .journal-row.header {
+    min-height: 30px;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .credit-account {
+    padding-left: 24px;
+  }
+
+  .example-note {
+    color: var(--muted);
+    font-size: 0.86rem;
+    line-height: 1.35;
+    font-weight: 800;
+  }
+
+  .answer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .answer-btn {
+    min-height: 54px;
+    border: 2px solid #9ab4d4;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+    font-weight: 900;
+    font-size: 0.9rem;
+    line-height: 1.18;
+    padding: 8px;
+  }
+
+  .answer-btn:hover {
+    border-color: var(--teal);
+  }
+
+  .answer-btn.selected.correct {
+    border-color: var(--green);
+    background: #eef8f5;
+    color: var(--green);
+  }
+
+  .answer-btn.selected.incorrect {
+    border-color: var(--red);
+    background: #fff3f0;
+    color: var(--red);
+  }
+
+  .feedback {
+    min-height: 44px;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-weight: 850;
+    line-height: 1.35;
+  }
+
+  .feedback.correct {
+    background: #eef8f5;
+    border-color: rgba(25, 135, 84, 0.3);
+    color: var(--green);
+  }
+
+  .feedback.incorrect {
+    background: #fff3f0;
+    border-color: rgba(189, 67, 50, 0.3);
+    color: var(--red);
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+
+    50% {
+      transform: scale(1.08);
+    }
+  }
+
+  @keyframes barLift {
+    0%, 100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+
+  @keyframes influenceFlow {
+    0%, 100% {
+      opacity: 0.35;
+      transform: scaleX(0.78);
+    }
+
+    50% {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+  }
+
+  @media (max-width: 980px) {
+    .stage {
+      grid-template-columns: 1fr;
+    }
+
+    .story-panel,
+    .accounting-panel {
+      min-height: 0;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .app {
+      padding: 18px 10px 28px;
+    }
+
+    .investment-scene {
+      min-height: 800px;
+    }
+
+    .cash-base {
+      left: 5%;
+      top: 18px;
+      width: 142px;
+      min-height: 96px;
+    }
+
+    .return-bubble {
+      right: 5%;
+      top: 18px;
+      width: min(208px, 44%);
+    }
+
+    .cash-token {
+      left: calc(5% + 48px);
+      top: 118px;
+    }
+
+    .choice-lane {
+      grid-template-columns: 1fr;
+      top: 190px;
+      bottom: 100px;
+      gap: 10px;
+    }
+
+    .investment-card {
+      min-height: 156px;
+      align-content: center;
+    }
+
+    .bond-paper,
+    .stock-paper {
+      transform: scale(0.78);
+    }
+
+    .influence-graphic {
+      transform: scale(0.78);
+    }
+
+    .method-bonds .cash-token,
+    .method-small-stock .cash-token,
+    .method-influence .cash-token {
+      left: calc(5% + 48px);
+      top: 118px;
+    }
+
+    .compare-strip,
+    .investment-tabs,
+    .answer-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .controls {
+      grid-template-columns: 1fr;
+    }
+
+    .journal-row {
+      font-size: 0.86rem;
+    }
+  }
+</style>
+</head>
+<body>
+<main class="app">
+  <header>
+    <div>
+      <div class="kicker">Ch 10 · Investments — Fair Value, Equity, Consolidation</div>
+      <h1>What Does the Company Want From This Investment?</h1>
+    </div>
+    <p class="header-note">The same extra cash can buy very different investments. Accounting depends on what the company bought and what it wants from the investment.</p>
+  </header>
+
+  <section class="stage">
+    <section class="story-panel" aria-label="Investment purpose animation">
+      <div class="story-band">
+        <div class="step-count" id="stepCount">Step 1 of 5</div>
+        <h2 id="storyTitle">The company has extra cash</h2>
+        <p id="storyText">Management is choosing what to do with extra cash. The accounting question starts with the investment's purpose.</p>
+      </div>
+
+      <div class="investment-scene method-overview" id="investmentScene">
+        <div class="cash-base">
+          <div class="cash-label">Extra cash</div>
+          <div class="cash-amount">$90,000</div>
+        </div>
+        <div class="cash-token">$</div>
+
+        <div class="return-bubble">
+          <div class="return-kicker" id="returnKicker">Investment return</div>
+          <div class="return-main" id="returnMain">Interest, dividends, gains, or influence?</div>
+        </div>
+
+        <div class="choice-lane">
+          <div class="investment-card bond-card" id="bondCard">
+            <div class="card-copy">
+              <div class="card-title">Buy bonds</div>
+              <div class="card-subtitle">Earn interest</div>
+            </div>
+            <div class="bond-paper">
+              <div class="paper-line"></div>
+              <div class="paper-line"></div>
+              <div class="coupon">Interest</div>
+            </div>
+          </div>
+
+          <div class="investment-card stock-card" id="stockCard">
+            <div class="card-copy">
+              <div class="card-title">Buy a small amount of stock</div>
+              <div class="card-subtitle">Dividends and gains</div>
+            </div>
+            <div class="stock-paper">
+              <div class="stock-bars">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <div class="dividend-chip">Dividend</div>
+            </div>
+          </div>
+
+          <div class="investment-card influence-card" id="influenceCard">
+            <div class="card-copy">
+              <div class="card-title">Buy enough stock to influence</div>
+              <div class="card-subtitle">Equity method</div>
+            </div>
+            <div class="influence-graphic">
+              <div class="percent-badge">30%</div>
+              <div class="company-node left">Us</div>
+              <div class="influence-line"></div>
+              <div class="company-node right">Them</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="purpose-card">
+          <div class="purpose-kicker" id="purposeKicker">Decision question</div>
+          <div class="purpose-text" id="purposeText">Do we want interest, dividends and gains, or influence over another company?</div>
+        </div>
+      </div>
+
+      <div class="compare-strip">
+        <div class="compare-card">
+          <div class="compare-title">Bonds</div>
+          <div class="compare-main">Debt investment</div>
+          <div class="compare-note">The investor lends money and expects interest.</div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-title">Small stock holding</div>
+          <div class="compare-main">No significant influence</div>
+          <div class="compare-note">The investor mainly expects dividends and gains.</div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-title">Influence stock holding</div>
+          <div class="compare-main">Equity method</div>
+          <div class="compare-note">The investor can influence operating and financial decisions.</div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="accounting-panel">
+      <div class="panel-title">
+        <h2>Investment Purpose</h2>
+        <span class="active-pill" id="activePill">Step 1 of 5</span>
+      </div>
+
+      <div class="tab-instruction">Click each investment type. The <b>purpose</b> (trading vs. influence vs. control) and the <b>ownership %</b> together decide which method you use: fair value, equity, or consolidation.</div>
+      <div class="investment-tabs" id="investmentTabs"></div>
+
+      <div class="controls">
+        <button class="btn btn-muted" type="button" id="prevBtn">Previous</button>
+        <button class="btn btn-main" type="button" id="nextBtn">Next Step</button>
+        <button class="btn btn-reset" type="button" id="resetBtn">Reset</button>
+      </div>
+
+      <div class="focus-card">
+        <div class="focus-kicker" id="focusKicker">Big idea</div>
+        <div class="focus-title" id="focusTitle">Purpose drives accounting</div>
+        <p class="focus-text" id="focusText">Before choosing the accounting treatment, ask what the company wants from the investment.</p>
+        <div class="exam-clue" id="examClueBox" hidden></div>
+      </div>
+
+      <div class="example-card">
+        <div class="example-kicker" id="exampleKicker">Accounting example</div>
+        <div class="example-title" id="exampleTitle">Three investment paths</div>
+        <div class="formula-box">
+          <div class="formula-label" id="formulaLabel">Decision rule</div>
+          <div class="formula-text" id="formulaText">Investment type plus purpose determines the accounting treatment.</div>
+        </div>
+        <div class="journal-table" id="journalTable"></div>
+        <p class="example-note" id="exampleNote">Students should identify the investment purpose before memorizing entries.</p>
+      </div>
+
+      <div class="quiz-card" id="quizCard"></div>
+    </aside>
+  </section>
+</main>
+
+<script>
+  const defaultChoices = ["Interest", "Dividends and gains", "Influence", "Capital gains only"];
+
+  const steps = [
+    {
+      id: "overview",
+      tab: "Overview",
+      tabSub: "Start with purpose",
+      storyTitle: "The company has extra cash",
+      storyText: "Management is choosing what to do with extra cash. The accounting question starts with the investment's purpose.",
+      returnKicker: "Investment return",
+      returnMain: "Interest, dividends, gains, or influence?",
+      purposeKicker: "Decision question",
+      purposeText: "Do we want interest, dividends and gains, or influence over another company?",
+      activeCards: [],
+      focusKicker: "Big idea",
+      focusTitle: "Purpose drives accounting",
+      focusText: "Before choosing the accounting treatment, ask what the company wants from the investment.",
+      quiz: {
+        question: "What question should students ask first when classifying an investment?",
+        choices: ["What does the company want from it?", "What is the issuer's credit rating?", "How will it appear on the balance sheet?", "What is the broker's commission?"],
+        correct: "What does the company want from it?",
+        correctText: "Correct. The investment's purpose drives the accounting treatment — that's the framing question for Chapter 10.",
+        incorrectText: "Try again. Credit rating, balance sheet presentation, and commission all matter — but they come AFTER you know what the company wanted from the investment."
+      },
+      exampleKicker: "Accounting example",
+      exampleTitle: "Three investment paths",
+      formulaLabel: "Decision rule",
+      formulaText: "Investment type plus purpose determines the accounting treatment.",
+      columns: ["Choice", "Main return", "Accounting focus"],
+      rows: [
+        ["Buy bonds", "Interest", "Debt investment"],
+        ["Buy small stock holding", "Dividends and gains", "Equity investment"],
+        ["Buy influence stock holding", "Share of investee income", "Equity method"]
+      ],
+      note: "Students should identify the investment purpose before memorizing entries."
+    },
+    {
+      id: "bonds",
+      tab: "Bonds",
+      tabSub: "Earn interest",
+      storyTitle: "Buy bonds to earn interest",
+      storyText: "A bond investment is a debt investment. The investor lends money and expects interest revenue.",
+      returnKicker: "Main return",
+      returnMain: "Interest revenue",
+      purposeKicker: "Purpose",
+      purposeText: "The company is not trying to influence the bond issuer. It wants interest payments.",
+      activeCards: ["bondCard"],
+      focusKicker: "Debt investment",
+      focusTitle: "Bonds create interest revenue",
+      focusText: "The investor records the bond as an investment asset. Interest payments are recorded as Interest Revenue.",
+      examClue: "Debt investments are classified as Trading, Available-for-Sale (AFS), or Held-to-Maturity (HTM). HTM keeps cost basis; trading/AFS are marked to fair value at period-end.",
+      quiz: {
+        question: "What does the company mainly expect from buying bonds?",
+        correct: "Interest",
+        correctText: "Correct. Bonds are debt investments, so the investor expects interest.",
+        incorrectText: "Try again. A bond is like lending money to earn interest."
+      },
+      exampleKicker: "Accounting example",
+      exampleTitle: "Bond purchase and interest receipt",
+      formulaLabel: "Example",
+      formulaText: "Buy $10,000 of bonds, then receive 6% annual interest: $10,000 x 6% = $600.",
+      columns: ["Account", "Debit", "Credit"],
+      rows: [
+        ["Debt Investments", "$10,000", ""],
+        ["Cash", "", "$10,000", "credit"],
+        ["Cash", "$600", ""],
+        ["Interest Revenue", "", "$600", "credit"]
+      ],
+      note: "The first two rows record the purchase at face value (premium / discount is covered with Bonds Payable later). The last two rows record the interest receipt."
+    },
+    {
+      id: "small-stock",
+      tab: "Small stock",
+      tabSub: "Dividends and gains",
+      storyTitle: "Buy a small amount of stock",
+      storyText: "A small stock investment usually does not give significant influence. The investor mainly expects dividends and possible gains.",
+      returnKicker: "Main return",
+      returnMain: "Dividends and gains",
+      purposeKicker: "Purpose",
+      purposeText: "The company owns shares, but it does not have enough ownership to influence decisions.",
+      activeCards: ["stockCard"],
+      focusKicker: "Equity investment",
+      focusTitle: "Small stock holdings are not about influence",
+      focusText: "With no significant influence, dividends are recorded as revenue. Price changes can create gains or losses.",
+      examClue: "Classification matters: Trading securities → unrealized gain/loss on the Income Statement. AFS securities → unrealized gain/loss in OCI (Other Comprehensive Income).",
+      quiz: {
+        question: "What does the company mainly expect from a small stock investment?",
+        choices: ["Dividends and gains", "Interest", "Equity method income", "Depreciation"],
+        correct: "Dividends and gains",
+        correctText: "Correct. A small stock holding is usually about dividends and value changes, not influence.",
+        incorrectText: "Try again. Small stock ownership usually does not let the investor influence the company."
+      },
+      exampleKicker: "Accounting example",
+      exampleTitle: "Stock purchase and dividend receipt",
+      formulaLabel: "Example",
+      formulaText: "Buy 100 shares at $20 per share, then receive a $100 cash dividend.",
+      columns: ["Account", "Debit", "Credit"],
+      rows: [
+        ["Equity Investments", "$2,000", ""],
+        ["Cash", "", "$2,000", "credit"],
+        ["Cash", "$100", ""],
+        ["Dividend Revenue", "", "$100", "credit"]
+      ],
+      note: "Assumes no significant influence. At period-end, the stock is remeasured to fair value — creating an unrealized gain or loss recorded on the Income Statement (trading) or in OCI (AFS) depending on classification."
+    },
+    {
+      id: "influence",
+      tab: "Influence",
+      tabSub: "Equity method",
+      storyTitle: "Buy enough stock to influence another company",
+      storyText: "When the investor can significantly influence another company, the accounting changes to the equity method.",
+      returnKicker: "Main return",
+      returnMain: "Share of investee income",
+      purposeKicker: "Purpose",
+      purposeText: "The company wants more than dividends. It wants a voice in another company's decisions.",
+      activeCards: ["influenceCard"],
+      focusKicker: "Significant influence",
+      focusTitle: "Influence changes the accounting treatment",
+      focusText: "Significant influence triggers the equity method. The investor's investment account moves with the investee's net income (up) and dividends (down).",
+      examClue: "Ownership thresholds: under 20% → no significant influence (fair value) · 20%–50% → equity method · over 50% → control (consolidation, beyond this chapter).",
+      quiz: {
+        question: "What method is used when the investor has significant influence?",
+        choices: ["Equity method", "Interest method", "FIFO", "Allowance method"],
+        correct: "Equity method",
+        correctText: "Correct. Significant influence points to the equity method.",
+        incorrectText: "Try again. Influence over another company is the clue."
+      },
+      exampleKicker: "Accounting example",
+      exampleTitle: "Equity method example",
+      formulaLabel: "Example",
+      formulaText: "Buy 30% for $60,000. Investee earns $40,000 → investor's share is 30% × $40,000 = $12,000. Investee pays $10,000 in dividends → investor receives 30% × $10,000 = $3,000.",
+      columns: ["Account", "Debit", "Credit"],
+      rows: [
+        ["Equity Investments", "$60,000", ""],
+        ["Cash", "", "$60,000", "credit"],
+        ["Equity Investments", "$12,000", ""],
+        ["Equity in Investee Income", "", "$12,000", "credit"],
+        ["Cash", "$3,000", ""],
+        ["Equity Investments", "", "$3,000", "credit"]
+      ],
+      note: "Income was already recorded when the investee earned it, so the dividend is a return OF investment — not new revenue. Treating it as revenue would double-count."
+    },
+    {
+      id: "summary",
+      tab: "Compare",
+      tabSub: "Treatment depends",
+      storyTitle: "Accounting follows the investment's purpose",
+      storyText: "Bonds, small stock holdings, and influential stock holdings are all investments, but they are not accounted for the same way.",
+      returnKicker: "Big takeaway",
+      returnMain: "Type plus purpose equals treatment",
+      purposeKicker: "Conclusion",
+      purposeText: "Do not ask only, 'Did we buy an investment?' Ask what kind and why.",
+      activeCards: ["bondCard", "stockCard", "influenceCard"],
+      focusKicker: "Conclusion",
+      focusTitle: "Type and purpose drive the treatment",
+      focusText: "Debt investments emphasize interest. Small equity investments emphasize dividends and gains. Significant influence points to the equity method.",
+      quiz: {
+        question: "What changes the accounting treatment for investments?",
+        choices: ["Purpose and level of influence", "The month of purchase", "The office location", "The company logo"],
+        correct: "Purpose and level of influence",
+        correctText: "Correct. The investment's type, purpose, and influence level determine the accounting treatment.",
+        incorrectText: "Try again. The accounting treatment depends on what the company bought and why."
+      },
+      exampleKicker: "Big takeaway",
+      exampleTitle: "Investment decision map",
+      formulaLabel: "Memory hook",
+      formulaText: "Bonds: interest. Small stock: dividends and gains. Influence stock: equity method.",
+      columns: ["Investment", "Purpose", "Common treatment"],
+      rows: [
+        ["Bonds", "Earn interest", "Debt investment"],
+        ["Small stock holding", "Dividends and gains", "Equity investment"],
+        ["Influence stock holding", "Influence decisions", "Equity method"]
+      ],
+      note: "This is the organizing idea for Chapter 10: accounting depends on the investment's purpose."
+    }
+  ];
+
+  let activeIndex = 0;
+  let selectedChoice = "";
+
+  const el = {
+    stepCount: document.getElementById("stepCount"),
+    storyTitle: document.getElementById("storyTitle"),
+    storyText: document.getElementById("storyText"),
+    investmentScene: document.getElementById("investmentScene"),
+    returnKicker: document.getElementById("returnKicker"),
+    returnMain: document.getElementById("returnMain"),
+    purposeKicker: document.getElementById("purposeKicker"),
+    purposeText: document.getElementById("purposeText"),
+    bondCard: document.getElementById("bondCard"),
+    stockCard: document.getElementById("stockCard"),
+    influenceCard: document.getElementById("influenceCard"),
+    activePill: document.getElementById("activePill"),
+    investmentTabs: document.getElementById("investmentTabs"),
+    prevBtn: document.getElementById("prevBtn"),
+    nextBtn: document.getElementById("nextBtn"),
+    resetBtn: document.getElementById("resetBtn"),
+    focusKicker: document.getElementById("focusKicker"),
+    focusTitle: document.getElementById("focusTitle"),
+    focusText: document.getElementById("focusText"),
+    examClueBox: document.getElementById("examClueBox"),
+    exampleKicker: document.getElementById("exampleKicker"),
+    exampleTitle: document.getElementById("exampleTitle"),
+    formulaLabel: document.getElementById("formulaLabel"),
+    formulaText: document.getElementById("formulaText"),
+    journalTable: document.getElementById("journalTable"),
+    exampleNote: document.getElementById("exampleNote"),
+    quizCard: document.getElementById("quizCard")
+  };
+
+  function renderTabs() {
+    el.investmentTabs.innerHTML = "";
+
+    steps.forEach((step, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "investment-tab";
+      button.classList.toggle("active", index === activeIndex);
+      button.setAttribute("aria-pressed", index === activeIndex ? "true" : "false");
+      button.innerHTML = `
+        <span class="tab-number">${index + 1}</span>
+        <span class="tab-copy">
+          <span class="tab-main">${step.tab}</span>
+          <span class="tab-sub">${step.tabSub}</span>
+        </span>
+      `;
+      button.addEventListener("click", () => {
+        activeIndex = index;
+        selectedChoice = "";
+        render();
+      });
+      el.investmentTabs.appendChild(button);
+    });
+  }
+
+  function renderExample(step) {
+    const columns = step.columns || ["Account", "Debit", "Credit"];
+    const colCount = columns.length;
+    const isDebitCredit = columns[1] === "Debit" && columns[2] === "Credit";
+    const gridTemplate = colCount === 3
+      ? (isDebitCredit ? "minmax(0, 1fr) 84px 84px" : "minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 1.1fr)")
+      : "minmax(0, 1.2fr) 1fr 1fr 1fr";
+    const flagIndex = colCount;
+
+    const headerCells = columns.map((column) => `<div>${column}</div>`).join("");
+    const rows = step.rows.map((row) => {
+      const isCredit = row[flagIndex] === "credit";
+      const cells = Array.from({ length: colCount }, (_, i) => {
+        const cls = i === 0 && isCredit ? "credit-account" : "";
+        return `<div class="${cls}">${row[i] || ""}</div>`;
+      }).join("");
+      return `<div class="journal-row" style="grid-template-columns: ${gridTemplate}">${cells}</div>`;
+    }).join("");
+
+    el.exampleKicker.textContent = step.exampleKicker;
+    el.exampleTitle.textContent = step.exampleTitle;
+    el.formulaLabel.textContent = step.formulaLabel;
+    el.formulaText.textContent = step.formulaText;
+    el.journalTable.innerHTML = `
+      <div class="journal-row header" style="grid-template-columns: ${gridTemplate}">
+        ${headerCells}
+      </div>
+      ${rows}
+    `;
+    el.exampleNote.textContent = step.note;
+  }
+
+  function renderQuiz(quiz) {
+    const quizChoices = quiz.choices || defaultChoices;
+    const buttons = quizChoices.map((choice) => {
+      const status = selectedChoice === choice
+        ? (choice === quiz.correct ? " selected correct" : " selected incorrect")
+        : "";
+      return `<button class="answer-btn${status}" type="button" data-choice="${choice}">${choice}</button>`;
+    }).join("");
+
+    const feedbackClass = selectedChoice
+      ? (selectedChoice === quiz.correct ? " correct" : " incorrect")
+      : "";
+    const feedbackText = selectedChoice
+      ? (selectedChoice === quiz.correct ? quiz.correctText : quiz.incorrectText)
+      : "Pause here and ask students to choose before revealing the answer.";
+
+    el.quizCard.innerHTML = `
+      <div class="quiz-kicker">Student choice</div>
+      <div class="focus-title">${quiz.question}</div>
+      <div class="answer-grid">${buttons}</div>
+      <div class="feedback${feedbackClass}">${feedbackText}</div>
+    `;
+
+    el.quizCard.querySelectorAll(".answer-btn").forEach((button) => {
+      button.addEventListener("click", () => {
+        selectedChoice = button.dataset.choice;
+        render();
+      });
+    });
+  }
+
+  function render() {
+    const step = steps[activeIndex];
+    const countText = "Step " + (activeIndex + 1) + " of " + steps.length;
+
+    el.stepCount.textContent = countText;
+    el.storyTitle.textContent = step.storyTitle;
+    el.storyText.textContent = step.storyText;
+    el.returnKicker.textContent = step.returnKicker;
+    el.returnMain.textContent = step.returnMain;
+    el.purposeKicker.textContent = step.purposeKicker;
+    el.purposeText.textContent = step.purposeText;
+    el.activePill.textContent = countText;
+    el.focusKicker.textContent = step.focusKicker;
+    el.focusTitle.textContent = step.focusTitle;
+    el.focusText.textContent = step.focusText;
+    if (step.examClue) {
+      el.examClueBox.textContent = step.examClue;
+      el.examClueBox.hidden = false;
+    } else {
+      el.examClueBox.textContent = "";
+      el.examClueBox.hidden = true;
+    }
+    el.investmentScene.className = "investment-scene method-" + step.id;
+
+    [el.bondCard, el.stockCard, el.influenceCard].forEach((card) => {
+      card.classList.toggle("active", step.activeCards.includes(card.id));
+    });
+
+    el.prevBtn.disabled = activeIndex === 0;
+    el.nextBtn.disabled = activeIndex === steps.length - 1;
+
+    renderTabs();
+    renderExample(step);
+    renderQuiz(step.quiz);
+  }
+
+  el.prevBtn.addEventListener("click", () => {
+    if (activeIndex > 0) {
+      activeIndex -= 1;
+      selectedChoice = "";
+      render();
+    }
+  });
+
+  el.nextBtn.addEventListener("click", () => {
+    if (activeIndex < steps.length - 1) {
+      activeIndex += 1;
+      selectedChoice = "";
+      render();
+    }
+  });
+
+  el.resetBtn.addEventListener("click", () => {
+    activeIndex = 0;
+    selectedChoice = "";
+    render();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft" && activeIndex > 0) {
+      activeIndex -= 1;
+      selectedChoice = "";
+      render();
+    }
+
+    if (event.key === "ArrowRight" && activeIndex < steps.length - 1) {
+      activeIndex += 1;
+      selectedChoice = "";
+      render();
+    }
+  });
+
+  render();
+</script>
+<footer style="text-align:center;color:#5c6878;font-size:0.82rem;padding:18px 12px 10px;border-top:1px solid #d7e0ea;margin-top:24px;">Reference: Horngren, <i>Financial &amp; Managerial Accounting</i> (7th ed.) — Ch&nbsp;10 · Investments — Fair Value, Equity, Consolidation</footer>
+</body>
+</html>
