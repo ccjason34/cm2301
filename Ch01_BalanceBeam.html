@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Accounting Equation Balance Beam</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(180deg, #f8fafc 0%, #edf3f7 100%);
+    color: #172233;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  header {
+    text-align: center;
+    padding: 2rem 1rem 0.5rem;
+  }
+  header h1 { font-size: 1.5rem; font-weight: 800; color: #172233; }
+
+  .header-equation {
+    display: flex; align-items: center; justify-content: center;
+    flex-wrap: wrap; gap: 0.5rem;
+    margin-top: 0.8rem;
+    font-size: 1.6rem; font-weight: 900; letter-spacing: 0.02em;
+  }
+  .he-assets { color: #34d399; text-shadow: 0 0 18px rgba(52,211,153,0.5); }
+  .he-eq     { color: #172233; font-size: 1.8rem; }
+  .he-liab   { color: #f59e0b; text-shadow: 0 0 18px rgba(245,158,11,0.5); }
+  .he-equity { color: #818cf8; text-shadow: 0 0 18px rgba(129,140,248,0.5); }
+  .he-plus   { color: #64748b; }
+  .he-divider{ color: #475569; font-size: 1rem; align-self: center; padding: 0 0.25rem; }
+  .he-tagline{ font-size: 0.82rem; color: #64748b; font-weight: 500; width: 100%; text-align: center; margin-top: 0.2rem; letter-spacing: 0.04em; text-transform: uppercase; }
+
+  /* ── Equation display ── */
+  .equation {
+    display: flex; align-items: center; gap: 0.6rem;
+    margin: 1.2rem auto 0;
+    font-size: 1.1rem; font-weight: 700;
+  }
+  .eq-assets   { color: #34d399; }
+  .eq-eq       { color: #172233; }
+  .eq-liab     { color: #f59e0b; }
+  .eq-plus     { color: #94a3b8; }
+  .eq-equity   { color: #818cf8; }
+  .eq-val {
+    display: inline-block;
+    min-width: 3.5rem; text-align: center;
+    background: rgba(255,255,255,0.08);
+    border-radius: 6px; padding: 0.15rem 0.5rem;
+    transition: transform 0.15s, background 0.15s;
+  }
+  .eq-val.pop { transform: scale(1.3); background: rgba(255,255,255,0.2); }
+
+  /* ── Scene ── */
+  #scene {
+    flex: 1;
+    min-width: 0;
+    height: 420px;
+    position: relative;
+    user-select: none;
+  }
+
+  /* Fulcrum */
+  #fulcrum {
+    position: absolute;
+    left: 50%; bottom: 60px;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 24px solid transparent;
+    border-right: 24px solid transparent;
+    border-bottom: 44px solid #475569;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+  }
+  #fulcrum-base {
+    position: absolute;
+    left: 50%; bottom: 56px;
+    transform: translateX(-50%);
+    width: 80px; height: 8px;
+    background: #475569; border-radius: 4px;
+  }
+
+  /* Beam */
+  #beam {
+    position: absolute;
+    width: 82%; height: 16px;
+    left: 9%; bottom: 102px;
+    background: linear-gradient(180deg, #7dd3fc, #38bdf8);
+    border-radius: 8px;
+    transform-origin: center bottom;
+    transition: transform 0.7s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow: 0 4px 16px rgba(56,189,248,0.35);
+  }
+
+  /* Platforms */
+  .platform {
+    position: absolute;
+    bottom: 118px; width: 38%;
+    display: flex; flex-direction: column-reverse;
+    align-items: center;
+    gap: 4px;
+  }
+  #plat-left  { left: 3%; }
+  #plat-right { right: 3%; }
+
+  /* Blocks */
+  .block {
+    width: 130px; height: 38px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700; color: #fff;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+    transform: scaleY(0); opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+  }
+  .block.show { transform: scaleY(1); opacity: 1; }
+
+  .block-asset  { background: linear-gradient(135deg,#059669,#34d399); }
+  .block-liab   { background: linear-gradient(135deg,#b45309,#f59e0b); }
+  .block-equity { background: linear-gradient(135deg,#4338ca,#818cf8); }
+  .block-out    { background: linear-gradient(135deg,#991b1b,#f87171); }
+
+  /* Labels inside the beam bar */
+  #beam {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+  }
+  .beam-label {
+    font-size: 0.65rem; font-weight: 800; letter-spacing: 0.06em;
+    text-transform: uppercase; color: #0c3a52;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  /* Floor */
+  #floor {
+    position: absolute;
+    bottom: 52px; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg,transparent,#d7e0ea,transparent);
+    border-radius: 3px;
+  }
+
+  /* Status banner */
+  #status {
+    height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.88rem; font-weight: 700; letter-spacing: 0.03em;
+    transition: color 0.3s;
+  }
+
+  /* Transaction log */
+  #log {
+    width: 100%; max-width: 800px;
+    padding: 0 1rem 1rem;
+    display: flex; flex-direction: column; gap: 0.4rem;
+    max-height: 160px; overflow-y: auto;
+  }
+  .log-entry {
+    background: rgba(255,255,255,0.05);
+    border-left: 3px solid #38bdf8;
+    border-radius: 0 6px 6px 0;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.78rem; color: #172233;
+    opacity: 0; transform: translateX(-12px);
+    animation: slideIn 0.4s forwards;
+  }
+  .log-entry .label { font-weight: 700; color: #172233; }
+  @keyframes slideIn {
+    to { opacity:1; transform: translateX(0); }
+  }
+
+  /* Buttons */
+  #controls {
+    width: 100%; max-width: 800px;
+    padding: 0.75rem 1rem;
+    display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;
+  }
+  .btn {
+    padding: 0.5rem 1rem;
+    border: none; border-radius: 8px;
+    font-size: 0.8rem; font-weight: 700;
+    cursor: pointer; transition: transform 0.1s, opacity 0.2s;
+    color: #fff;
+  }
+  .btn:active { transform: scale(0.95); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-green  { background: linear-gradient(135deg,#059669,#34d399); }
+  .btn-amber  { background: linear-gradient(135deg,#b45309,#f59e0b); }
+  .btn-indigo { background: linear-gradient(135deg,#4338ca,#818cf8); }
+  .btn-red    { background: linear-gradient(135deg,#991b1b,#f87171); }
+  .btn-gray   { background: linear-gradient(135deg,#6b7788,#94a3b8); }
+
+  /* Shake animation for wrong */
+  @keyframes shake {
+    0%,100%{transform:rotate(0deg)} 20%{transform:rotate(-4deg)} 40%{transform:rotate(4deg)}
+    60%{transform:rotate(-3deg)} 80%{transform:rotate(2deg)}
+  }
+  .shake { animation: shake 0.45s ease; }
+
+  /* ── Scene row (beam + side boxes) ── */
+  .scene-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 1060px;
+    gap: 0.75rem;
+    padding: 0 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  /* ── Side total boxes ── */
+  .side-total {
+    flex-shrink: 0;
+    width: 130px;
+    border-radius: 14px;
+    padding: 1rem 0.75rem 0.9rem;
+    text-align: center;
+    border: 3px solid;
+    transition: border-color 0.4s, box-shadow 0.4s, background 0.4s;
+  }
+  #total-left  { border-color: #34d399; box-shadow: 0 0 22px rgba(52,211,153,0.35); background: rgba(5,150,105,0.12); }
+  #total-right { border-color: #f59e0b; box-shadow: 0 0 22px rgba(245,158,11,0.35); background: rgba(180,83,9,0.12); }
+  #total-left.unbalanced  { border-color: #f87171; box-shadow: 0 0 28px rgba(248,113,113,0.6); background: rgba(153,27,27,0.18); }
+  #total-right.unbalanced { border-color: #f87171; box-shadow: 0 0 28px rgba(248,113,113,0.6); background: rgba(153,27,27,0.18); }
+
+  .st-label {
+    font-size: 0.62rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.09em; margin-bottom: 0.3rem;
+  }
+  #total-left  .st-label { color: #34d399; }
+  #total-right .st-label { color: #f59e0b; }
+  #total-left.unbalanced  .st-label { color: #f87171; }
+  #total-right.unbalanced .st-label { color: #f87171; }
+
+  .st-val {
+    font-size: 1.1rem; font-weight: 900; line-height: 1;
+    transition: transform 0.2s, color 0.4s;
+  }
+  #total-left  .st-val { color: #34d399; }
+  #total-right .st-val { color: #f59e0b; }
+  #total-left.unbalanced  .st-val { color: #f87171; }
+  #total-right.unbalanced .st-val { color: #f87171; }
+
+  @keyframes stPulse {
+    0%   { transform: scale(1); }
+    35%  { transform: scale(1.14); }
+    100% { transform: scale(1); }
+  }
+  .st-val.bump { animation: stPulse 0.38s ease; }
+
+  /* Pulse for balanced */
+  @keyframes glow {
+    0%,100%{box-shadow:0 4px 16px rgba(56,189,248,0.35)}
+    50%{box-shadow:0 4px 32px rgba(56,189,248,0.9)}
+  }
+  .balanced { animation: glow 1.2s ease 2; }
+
+  /* ── Tabs ── */
+  .tab-bar { display:flex; gap:.5rem; justify-content:center; padding:.65rem 1rem .2rem; }
+  .tab-btn { padding:.42rem 1.5rem; border:2px solid #d7e0ea; background:transparent; border-radius:20px; font-size:.88rem; font-weight:700; color:#64748b; cursor:pointer; transition:all .2s; }
+  .tab-btn.active { background:#38bdf8; border-color:#38bdf8; color:#ffffff; }
+  .tab-btn:hover:not(.active) { border-color:#a0aec0; color:#172233; }
+
+  /* ── Quiz ── */
+  .quiz-wrap { width:100%; max-width:720px; margin:0 auto; padding:1rem 1rem 2rem; display:flex; flex-direction:column; gap:1.25rem; }
+  .q-card { background:#ffffff; border:2px solid #d7e0ea; border-radius:14px; padding:1.3rem 1.5rem; }
+  .q-num  { font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:#475569; font-weight:700; margin-bottom:.5rem; }
+  .q-text { font-size:1.05rem; font-weight:700; color:#172233; line-height:1.45; margin-bottom:.95rem; }
+  .q-opts { display:flex; flex-direction:column; gap:.45rem; }
+  .opt { display:flex; align-items:center; gap:.75rem; background:#f9fbfd; border:2px solid #d7e0ea; border-radius:9px; padding:.65rem 1rem; cursor:pointer; transition:border-color .15s, background .15s; font-size:.9rem; color:#172233; }
+  .opt:hover:not(.locked) { border-color:#64748b; background:#eef4fb; }
+  .opt input[type=radio] { accent-color:#38bdf8; width:15px; height:15px; flex-shrink:0; }
+  .opt.correct { border-color:#34d399; background:rgba(52,211,153,.12); color:#a7f3d0; }
+  .opt.wrong   { border-color:#f87171; background:rgba(248,113,113,.12); color:#fca5a5; }
+  .q-fb { margin-top:.75rem; font-size:.85rem; font-weight:600; line-height:1.45; min-height:1rem; }
+  .q-fb.ok  { color:#34d399; }
+  .q-fb.err { color:#f87171; }
+  .quiz-footer { display:flex; flex-direction:column; align-items:center; gap:.75rem; padding-bottom:1rem; }
+  .score-box { font-size:1.1rem; font-weight:800; color:#172233; display:none; text-align:center; }
+</style>
+</head>
+<body>
+
+<header>
+  <div style="color:#2f80ed;font-size:0.78rem;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Ch 1 · The Accounting Equation</div>
+  <h1>The Accounting Equation Balance Beam</h1>
+  <p style="color:#5c6878;font-size:0.95rem;line-height:1.45;margin:8px 0 0;max-width:680px;">Click any transaction button below. The beam tilts, then rebalances. Try them in any order — Assets always equals Liabilities + Equity.</p>
+  <div class="header-equation">
+    <span class="he-assets">Assets</span>
+    <span class="he-eq">=</span>
+    <span class="he-liab">Liabilities</span>
+    <span class="he-plus">+</span>
+    <span class="he-equity">Equity</span>
+    <span class="he-divider">·</span>
+    <span class="he-tagline">The beam must always stay balanced</span>
+  </div>
+</header>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('anim')">⚖️ Animation</button>
+  <button class="tab-btn" onclick="switchTab('quiz')">📝 Quick Check</button>
+</div>
+
+<div id="pane-anim">
+
+<!-- Live equation -->
+<div class="equation">
+  <span class="eq-assets">Assets</span>
+  <span class="eq-val eq-assets" id="val-assets">$0</span>
+  <span class="eq-eq">=</span>
+  <span class="eq-liab">Liabilities</span>
+  <span class="eq-val eq-liab" id="val-liab">$0</span>
+  <span class="eq-plus">+</span>
+  <span class="eq-equity">Equity</span>
+  <span class="eq-val eq-equity" id="val-equity">$0</span>
+</div>
+
+<!-- Scene row: [Assets box] [beam] [L+E box] -->
+<div class="scene-row">
+
+  <div class="side-total" id="total-left">
+    <div class="st-label">Assets</div>
+    <div class="st-val" id="st-assets">$0</div>
+  </div>
+
+  <div id="scene">
+  <div id="beam">
+    <span class="beam-label" id="label-left">Assets</span>
+    <span class="beam-label" id="label-right">Liabilities + Equity</span>
+  </div>
+  <div id="plat-left"  class="platform"></div>
+  <div id="plat-right" class="platform"></div>
+  <div id="fulcrum"></div>
+  <div id="fulcrum-base"></div>
+  <div id="floor"></div>
+  </div><!-- /#scene -->
+
+  <div class="side-total" id="total-right">
+    <div class="st-label">Liabilities + Equity</div>
+    <div class="st-val" id="st-le">$0</div>
+  </div>
+
+</div><!-- /.scene-row -->
+
+<div id="status">Click a transaction below to begin</div>
+
+<!-- Buttons -->
+<div id="controls">
+  <button class="btn btn-green"  onclick="doTx(0)">💵 Owner Invests $10,000</button>
+  <button class="btn btn-amber"  onclick="doTx(1)">🏦 Borrow $5,000 (Loan)</button>
+  <button class="btn btn-green"  onclick="doTx(2)">🖥 Buy Equipment $3,000 Cash</button>
+  <button class="btn btn-indigo" onclick="doTx(3)">📋 Earn Revenue $4,000</button>
+  <button class="btn btn-amber"  onclick="doTx(4)">💳 Buy Supplies $1,000 on Credit</button>
+  <button class="btn btn-red"    onclick="doTx(5)">⚠️ Wrong: Add Asset Only $2,000</button>
+  <button class="btn btn-gray"   onclick="resetAll()">↺ Reset</button>
+</div>
+
+<!-- Log -->
+<div id="log"></div>
+
+</div><!-- /pane-anim -->
+
+<div id="pane-quiz" style="display:none">
+  <div class="quiz-wrap">
+    <div class="q-card" id="q1">
+      <div class="q-num">Question 1 of 3</div>
+      <div class="q-text">The accounting equation states:</div>
+      <div class="q-opts">
+        <label class="opt"><input type="radio" name="q1" value="A"> A) Assets = Revenues − Expenses</label>
+        <label class="opt"><input type="radio" name="q1" value="B"> B) Assets = Liabilities + Equity</label>
+        <label class="opt"><input type="radio" name="q1" value="C"> C) Assets + Liabilities = Equity</label>
+        <label class="opt"><input type="radio" name="q1" value="D"> D) Revenue − Expenses = Assets</label>
+      </div>
+      <div class="q-fb" id="fb1"></div>
+    </div>
+    <div class="q-card" id="q2">
+      <div class="q-num">Question 2 of 3</div>
+      <div class="q-text">A company buys $3,000 of equipment by paying cash. What happens to total assets?</div>
+      <div class="q-opts">
+        <label class="opt"><input type="radio" name="q2" value="A"> A) Total assets increase by $3,000</label>
+        <label class="opt"><input type="radio" name="q2" value="B"> B) Total assets decrease by $3,000</label>
+        <label class="opt"><input type="radio" name="q2" value="C"> C) Total assets stay the same</label>
+        <label class="opt"><input type="radio" name="q2" value="D"> D) Equity increases by $3,000</label>
+      </div>
+      <div class="q-fb" id="fb2"></div>
+    </div>
+    <div class="q-card" id="q3">
+      <div class="q-num">Question 3 of 3</div>
+      <div class="q-text">A company borrows $5,000 from a bank. Which accounts are affected?</div>
+      <div class="q-opts">
+        <label class="opt"><input type="radio" name="q3" value="A"> A) Cash ↑ and Owner Equity ↑</label>
+        <label class="opt"><input type="radio" name="q3" value="B"> B) Cash ↑ and Loan Payable ↑</label>
+        <label class="opt"><input type="radio" name="q3" value="C"> C) Loan Payable ↑ and Owner Equity ↑</label>
+        <label class="opt"><input type="radio" name="q3" value="D"> D) Only Loan Payable increases</label>
+      </div>
+      <div class="q-fb" id="fb3"></div>
+    </div>
+    <div class="quiz-footer">
+      <button class="btn btn-cyan" onclick="checkAnswers()">Check Answers</button>
+      <div class="score-box" id="score-box"></div>
+      <button class="btn btn-gray" id="retry-btn" onclick="retryQuiz()" style="display:none">↺ Try Again</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// State
+let state = { assets: 0, liabilities: 0, equity: 0 };
+let assetBlocks = [];
+let rightBlocks  = [];  // liabilities + equity mixed
+
+const beam     = document.getElementById('beam');
+const platL    = document.getElementById('plat-left');
+const platR    = document.getElementById('plat-right');
+const statusEl = document.getElementById('status');
+const logEl    = document.getElementById('log');
+
+const transactions = [
+  {
+    label: "Owner invests $10,000 cash",
+    da: 10000, dl: 0, de: 10000,
+    aBlocks: [{label:"Cash\n+$10,000", cls:"block-asset"}],
+    rBlocks: [{label:"Owner Equity\n+$10,000", cls:"block-equity"}],
+    msg: "Cash (Asset) ↑ $10,000  ·  Owner Equity ↑ $10,000",
+    correct: true
+  },
+  {
+    label: "Borrow $5,000 from bank",
+    da: 5000, dl: 5000, de: 0,
+    aBlocks: [{label:"Cash\n+$5,000", cls:"block-asset"}],
+    rBlocks: [{label:"Loan Payable\n+$5,000", cls:"block-liab"}],
+    msg: "Cash (Asset) ↑ $5,000  ·  Loan Payable (Liability) ↑ $5,000",
+    correct: true
+  },
+  {
+    label: "Buy equipment $3,000 cash",
+    da: 0, dl: 0, de: 0,
+    aBlocks: [{label:"Equipment\n+$3,000", cls:"block-asset"},{label:"Cash\n−$3,000",cls:"block-asset",remove:true}],
+    rBlocks: [],
+    msg: "Equipment (Asset) ↑ $3,000  ·  Cash (Asset) ↓ $3,000 — total Assets unchanged",
+    special: "assetSwap",
+    correct: true
+  },
+  {
+    label: "Earn $4,000 revenue (cash)",
+    da: 4000, dl: 0, de: 4000,
+    aBlocks: [{label:"Cash\n+$4,000", cls:"block-asset"}],
+    rBlocks: [{label:"Retained Earnings\n+$4,000", cls:"block-equity"}],
+    msg: "Cash (Asset) ↑ $4,000  ·  Retained Earnings (Equity) ↑ $4,000",
+    correct: true
+  },
+  {
+    label: "Buy supplies $1,000 on account",
+    da: 1000, dl: 1000, de: 0,
+    aBlocks: [{label:"Supplies\n+$1,000", cls:"block-asset"}],
+    rBlocks: [{label:"Accounts Payable\n+$1,000", cls:"block-liab"}],
+    msg: "Supplies (Asset) ↑ $1,000  ·  Accounts Payable (Liability) ↑ $1,000",
+    correct: true
+  },
+  {
+    label: "⚠️ WRONG: Add asset only (no matching entry)",
+    da: 2000, dl: 0, de: 0,
+    aBlocks: [{label:"Cash?\n+$2,000", cls:"block-asset"}],
+    rBlocks: [],
+    msg: "❌ Equation broken! Assets ≠ Liabilities + Equity — every transaction needs TWO entries!",
+    correct: false
+  }
+];
+
+let txUsed = new Set();
+
+function fmt(n){ return '$' + n.toLocaleString(); }
+
+function popVal(id){
+  const el = document.getElementById(id);
+  el.classList.remove('pop');
+  void el.offsetWidth;
+  el.classList.add('pop');
+  setTimeout(()=>el.classList.remove('pop'),300);
+}
+
+function updateEquation(){
+  document.getElementById('val-assets').textContent  = fmt(state.assets);
+  document.getElementById('val-liab').textContent    = fmt(state.liabilities);
+  document.getElementById('val-equity').textContent  = fmt(state.equity);
+  ['val-assets','val-liab','val-equity'].forEach(popVal);
+  updateSideTotals();
+}
+
+function updateSideTotals(){
+  const le       = state.liabilities + state.equity;
+  const balanced = state.assets === le;
+
+  const lBox  = document.getElementById('total-left');
+  const rBox  = document.getElementById('total-right');
+  const lVal  = document.getElementById('st-assets');
+  const rVal  = document.getElementById('st-le');
+
+  lVal.textContent = fmt(state.assets);
+  rVal.textContent = fmt(le);
+
+  // Balanced / unbalanced colouring
+  lBox.classList.toggle('unbalanced', !balanced);
+  rBox.classList.toggle('unbalanced', !balanced);
+
+  // Bump animation
+  [lVal, rVal].forEach(el => {
+    el.classList.remove('bump');
+    void el.offsetWidth;
+    el.classList.add('bump');
+    setTimeout(() => el.classList.remove('bump'), 400);
+  });
+}
+
+function addLog(tx){
+  const div = document.createElement('div');
+  div.className = 'log-entry';
+  div.innerHTML = `<span class="label">${tx.label}</span> — ${tx.msg}`;
+  logEl.prepend(div);
+}
+
+function tiltBeam(){
+  const diff = state.assets - (state.liabilities + state.equity);
+  const angle = Math.max(-18, Math.min(18, diff / 1000));
+  beam.style.transform = `rotate(${angle}deg)`;
+}
+
+function makeBlock(info, parent){
+  const div = document.createElement('div');
+  div.className = `block ${info.cls}`;
+  div.style.whiteSpace = 'pre-line';
+  div.textContent = info.label;
+  parent.appendChild(div);
+  requestAnimationFrame(()=> div.classList.add('show'));
+  return div;
+}
+
+function doTx(idx){
+  const tx = transactions[idx];
+  if(txUsed.has(idx) && idx !== 5) return;
+  txUsed.add(idx);
+
+  if(tx.special === 'assetSwap'){
+    addLog(tx);
+    statusEl.innerHTML = '✅ ' + tx.msg;
+    statusEl.style.color = '#34d399';
+    updateEquation();
+    updateSideTotals();
+
+    // Add Equipment +$3,000 (green, stays)
+    makeBlock(tx.aBlocks[0], platL);
+    // Add Cash −$3,000 (red, stays) — the two cancel: net $0 change to Assets
+    makeBlock({ label: 'Cash\n−$3,000', cls: 'block-out' }, platL);
+
+    setTimeout(()=>{ beam.classList.add('balanced'); setTimeout(()=>beam.classList.remove('balanced'),2500); },400);
+    return;
+  }
+
+  // Update state
+  state.assets      += tx.da;
+  state.liabilities += tx.dl;
+  state.equity      += tx.de;
+
+  updateEquation();
+  addLog(tx);
+
+  // Add blocks
+  tx.aBlocks.forEach(b => makeBlock(b, platL));
+  tx.rBlocks.forEach(b => makeBlock(b, platR));
+
+  setTimeout(()=>{
+    tiltBeam();
+    if(tx.correct){
+      statusEl.innerHTML = '✅ ' + tx.msg;
+      statusEl.style.color = '#34d399';
+      setTimeout(()=>{ beam.classList.add('balanced'); setTimeout(()=>beam.classList.remove('balanced'),2500); },400);
+    } else {
+      statusEl.innerHTML = tx.msg;
+      statusEl.style.color = '#f87171';
+      beam.classList.remove('balanced');
+      beam.classList.add('shake');
+      setTimeout(()=>beam.classList.remove('shake'),500);
+      // auto-correct after 2s
+      setTimeout(()=>{
+        state.assets -= tx.da;
+        updateEquation();
+        tiltBeam();
+        // remove the bad block
+        const bad = platL.lastElementChild;
+        if(bad){ bad.classList.remove('show'); setTimeout(()=>bad.remove(),400); }
+        statusEl.innerHTML = '⚠️ Auto-corrected! Double-entry accounting requires <em>both</em> sides to balance.';
+        statusEl.style.color = '#fbbf24';
+        txUsed.delete(idx); // allow retry
+      },2200);
+    }
+  }, 150);
+}
+
+function resetAll(){
+  state = { assets:0, liabilities:0, equity:0 };
+  txUsed.clear();
+  platL.innerHTML = '';
+  platR.innerHTML = '';
+  beam.style.transform = 'rotate(0deg)';
+  beam.classList.remove('balanced','shake');
+  updateEquation();
+  updateSideTotals();
+  statusEl.textContent = 'Click a transaction below to begin';
+  statusEl.style.color = '#172233';
+  logEl.innerHTML = '';
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`).classList.add('active');
+  document.getElementById('pane-anim').style.display = tab === 'anim' ? '' : 'none';
+  document.getElementById('pane-quiz').style.display = tab === 'quiz' ? '' : 'none';
+}
+
+const correctAnswers = { q1: 'B', q2: 'C', q3: 'B' };
+const quizFeedback = {
+  q1: { ok: '✅ Correct! Assets = Liabilities + Equity is the foundation of all accounting.', err: '❌ Not quite. The equation is Assets = Liabilities + Equity — every transaction keeps both sides equal.' },
+  q2: { ok: '✅ Correct! Cash ↓ $3,000 and Equipment ↑ $3,000 — both are assets, so total assets are unchanged.', err: '❌ Not quite. Buying equipment for cash swaps one asset for another: Cash ↓ and Equipment ↑. Total assets stay the same.' },
+  q3: { ok: '✅ Correct! Cash (asset) ↑ and Loan Payable (liability) ↑ by the same amount — both sides stay balanced.', err: '❌ Not quite. Borrowing cash increases an asset (Cash) and a liability (Loan Payable) by equal amounts.' }
+};
+
+function checkAnswers() {
+  let score = 0;
+  ['q1','q2','q3'].forEach(q => {
+    const card = document.getElementById(q);
+    const sel  = card.querySelector(`input[name="${q}"]:checked`);
+    const fb   = document.getElementById('fb' + q.slice(1));
+    const opts = card.querySelectorAll('.opt');
+    opts.forEach(o => o.classList.add('locked'));
+    if (!sel) { fb.textContent = '⚠️ Please select an answer.'; fb.className = 'q-fb err'; return; }
+    const chosen  = sel.value;
+    const correct = correctAnswers[q];
+    opts.forEach(o => {
+      const v = o.querySelector('input').value;
+      if (v === correct) o.classList.add('correct');
+      else if (v === chosen && chosen !== correct) o.classList.add('wrong');
+    });
+    if (chosen === correct) {
+      score++;
+      fb.textContent = quizFeedback[q].ok;
+      fb.className = 'q-fb ok';
+    } else {
+      fb.textContent = quizFeedback[q].err;
+      fb.className = 'q-fb err';
+    }
+  });
+  const sb = document.getElementById('score-box');
+  sb.style.display = 'block';
+  sb.textContent = score === 3
+    ? '🎉 Perfect score! 3 / 3 — You understand the accounting equation!'
+    : `Score: ${score} / 3 — Review the explanations above and try again.`;
+  document.getElementById('retry-btn').style.display = score < 3 ? '' : 'none';
+}
+
+function retryQuiz() {
+  ['q1','q2','q3'].forEach(q => {
+    const card = document.getElementById(q);
+    card.querySelectorAll('.opt').forEach(o => o.classList.remove('locked','correct','wrong'));
+    card.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);
+    const fb = document.getElementById('fb' + q.slice(1));
+    fb.textContent = '';
+    fb.className = 'q-fb';
+  });
+  document.getElementById('score-box').style.display = 'none';
+  document.getElementById('retry-btn').style.display = 'none';
+}
+
+// ── Keyboard navigation ──
+// → triggers the next un-used transaction (in order). If all 6 are used, no-op.
+document.addEventListener('keydown', (event) => {
+  if (event.target.matches('input, textarea, button')) return;
+  if (event.key === 'ArrowRight') {
+    for (let i = 0; i < 6; i++) {
+      if (!txUsed.has(i)) {
+        doTx(i);
+        return;
+      }
+    }
+  }
+});
+</script>
+<footer style="text-align:center;color:#5c6878;font-size:0.82rem;padding:18px 12px 10px;border-top:1px solid #d7e0ea;margin-top:24px;">Reference: Horngren, <i>Financial &amp; Managerial Accounting</i> (7th ed.) — Ch&nbsp;1 · The Accounting Equation</footer>
+</body>
+</html>
