@@ -146,6 +146,79 @@ header p  { font-size: 0.8rem; color: #5c6878; margin-top: 0.25rem; }
 }
 #narration span { font-style: italic; }
 
+/* ── Statement example ── */
+#statement-example {
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto .5rem;
+  padding: .85rem 1rem 1rem;
+  background: #ffffff;
+  border: 2px solid #d7e0ea;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(23, 34, 51, .08);
+}
+.example-kicker {
+  font-size: .7rem;
+  font-weight: 900;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: #2f80ed;
+  margin-bottom: .25rem;
+}
+.example-title {
+  font-size: 1rem;
+  font-weight: 900;
+  color: #172233;
+  line-height: 1.35;
+}
+.example-subtitle {
+  color: #5c6878;
+  font-size: .84rem;
+  font-weight: 700;
+  margin-top: .12rem;
+}
+.example-table {
+  display: flex;
+  flex-direction: column;
+  gap: .28rem;
+  margin-top: .65rem;
+}
+.example-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(86px, auto);
+  align-items: center;
+  gap: .75rem;
+  padding: .42rem .55rem;
+  border-radius: 8px;
+  background: #f9fbfd;
+  color: #172233;
+  font-size: .9rem;
+  font-weight: 700;
+}
+.example-row.section {
+  background: transparent;
+  color: #5c6878;
+  padding-bottom: .1rem;
+}
+.example-row.indent .example-label { padding-left: 1.15rem; }
+.example-row.total {
+  background: #fff7ed;
+  border-top: 2px solid #172233;
+  font-weight: 900;
+}
+.example-amount {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.example-note {
+  margin-top: .65rem;
+  color: #5c6878;
+  font-size: .86rem;
+  line-height: 1.45;
+  font-weight: 650;
+}
+
 /* ── Progress dots ── */
 #progress {
   display: flex; gap: 7px; justify-content: center; padding: .3rem;
@@ -293,6 +366,14 @@ header p  { font-size: 0.8rem; color: #5c6878; margin-top: 0.25rem; }
   <div id="narration">Four statements — each with a different job — together they tell the <span>complete financial story</span> of a business.</div>
 </div>
 
+<div id="statement-example">
+  <div class="example-kicker">Example Statement</div>
+  <div class="example-title" id="example-title">Select a statement to see an example</div>
+  <div class="example-subtitle" id="example-subtitle">Maya's Coffee Cart, Inc.</div>
+  <div class="example-table" id="example-table"></div>
+  <div class="example-note" id="example-note">Click Next to see how each financial statement looks with simple numbers.</div>
+</div>
+
 <div id="progress">
   <div class="dot active" id="dot-0"></div>
   <div class="dot" id="dot-1"></div>
@@ -375,35 +456,98 @@ const stages = [
     narration:  'Four statements — each with a different job — together they tell the <span>complete financial story</span> of a business.',
     active: [],
     drawArrows: [],
-    packets: []
+    packets: [],
+    example: {
+      title: 'Maya\'s Coffee Cart, Inc.',
+      subtitle: 'One small business, four connected statements',
+      rows: [
+        { label: 'Income Statement', amount: 'Profit?' },
+        { label: 'Statement of Retained Earnings', amount: 'Kept?' },
+        { label: 'Balance Sheet', amount: 'Own/Owe?' },
+        { label: 'Statement of Cash Flows', amount: 'Cash?' }
+      ],
+      note: 'Use the same business example as you move through the four statements.'
+    }
   },
   {
     stageLabel: 'Stage 1 of 4 · Income Statement',
     narration:  '📊 <strong style="color:#34d399">Income Statement</strong> — "I show if you made money!" I list all <em>revenues</em> minus all <em>expenses</em> to produce <strong>Net Income</strong> over a period of time.',
     active: ['is'],
     drawArrows: [],
-    packets: []
+    packets: [],
+    example: {
+      title: 'Maya\'s Coffee Cart, Inc.',
+      subtitle: 'Income Statement · For the Month Ended January 31',
+      rows: [
+        { label: 'Service Revenue', amount: '$4,000' },
+        { label: 'Expenses:', amount: '', section: true },
+        { label: 'Rent Expense', amount: '$900', indent: true },
+        { label: 'Supplies Expense', amount: '$700', indent: true },
+        { label: 'Net Income', amount: '$2,400', total: true }
+      ],
+      note: 'Revenue minus expenses gives Net Income. This number flows into the Statement of Retained Earnings.'
+    }
   },
   {
     stageLabel: 'Stage 2 of 4 · Statement of Retained Earnings',
     narration:  '💰 <strong style="color:#818cf8">Statement of Retained Earnings</strong> — "I show what you kept!" Net Income from the Income Statement flows into me. I also subtract any dividends paid to owners.',
     active: ['is', 'sre'],
     drawArrows: ['a1'],
-    packets: ['pkt1']
+    packets: ['pkt1'],
+    example: {
+      title: 'Maya\'s Coffee Cart, Inc.',
+      subtitle: 'Statement of Retained Earnings · For the Month Ended January 31',
+      rows: [
+        { label: 'Beginning Retained Earnings', amount: '$0' },
+        { label: 'Add: Net Income', amount: '$2,400' },
+        { label: 'Less: Dividends', amount: '($500)' },
+        { label: 'Ending Retained Earnings', amount: '$1,900', total: true }
+      ],
+      note: 'Net Income comes from the Income Statement. Ending Retained Earnings flows into the Equity section of the Balance Sheet.'
+    }
   },
   {
     stageLabel: 'Stage 3 of 4 · Balance Sheet',
     narration:  '⚖️ <strong style="color:#f59e0b">Balance Sheet</strong> — "I show what you own and owe!" Ending Retained Earnings from the SRE flows into my Equity section. I am a <em>snapshot</em> on a specific date.',
     active: ['is', 'sre', 'bs'],
     drawArrows: ['a1', 'a2'],
-    packets: ['pkt2']
+    packets: ['pkt2'],
+    example: {
+      title: 'Maya\'s Coffee Cart, Inc.',
+      subtitle: 'Balance Sheet · January 31',
+      rows: [
+        { label: 'Assets:', amount: '', section: true },
+        { label: 'Cash', amount: '$7,500', indent: true },
+        { label: 'Equipment', amount: '$3,000', indent: true },
+        { label: 'Total Assets', amount: '$10,500', total: true },
+        { label: 'Liabilities:', amount: '', section: true },
+        { label: 'Notes Payable', amount: '$5,000', indent: true },
+        { label: 'Equity:', amount: '', section: true },
+        { label: 'Common Stock', amount: '$3,600', indent: true },
+        { label: 'Retained Earnings', amount: '$1,900', indent: true },
+        { label: 'Total Liabilities and Equity', amount: '$10,500', total: true }
+      ],
+      note: 'The Balance Sheet must balance: Assets = Liabilities + Equity.'
+    }
   },
   {
     stageLabel: 'Stage 4 of 4 · Statement of Cash Flows',
     narration:  '💸 <strong style="color:#38bdf8">Statement of Cash Flows</strong> — "I show where cash actually went!" My ending Cash balance must match the Cash figure on the Balance Sheet.',
     active: ['is', 'sre', 'bs', 'scf'],
     drawArrows: ['a1', 'a2', 'a3'],
-    packets: ['pkt3']
+    packets: ['pkt3'],
+    example: {
+      title: 'Maya\'s Coffee Cart, Inc.',
+      subtitle: 'Statement of Cash Flows · For the Month Ended January 31',
+      rows: [
+        { label: 'Cash flows from operating activities', amount: '$2,400' },
+        { label: 'Cash flows from investing activities', amount: '($3,000)' },
+        { label: 'Cash flows from financing activities', amount: '$8,100' },
+        { label: 'Net increase in cash', amount: '$7,500', total: true },
+        { label: 'Ending cash balance', amount: '$7,500', total: true }
+      ],
+      note: 'Ending cash on the Statement of Cash Flows must match Cash on the Balance Sheet.'
+    }
   },
   {
     stageLabel: 'All Together',
@@ -411,11 +555,35 @@ const stages = [
     active: ['is', 'sre', 'bs', 'scf'],
     drawArrows: ['a1', 'a2', 'a3'],
     packets: [],
-    allPulse: true
+    allPulse: true,
+    example: {
+      title: 'Maya\'s Coffee Cart, Inc.',
+      subtitle: 'How the four statements connect',
+      rows: [
+        { label: 'Income Statement', amount: 'Net Income $2,400' },
+        { label: 'Statement of Retained Earnings', amount: 'Ending RE $1,900' },
+        { label: 'Balance Sheet', amount: 'Assets $10,500' },
+        { label: 'Statement of Cash Flows', amount: 'Cash $7,500' }
+      ],
+      note: 'The same numbers travel through the statements: Net Income affects Retained Earnings, and Ending Cash appears on the Balance Sheet.'
+    }
   }
 ];
 
 let currentStage = 0;
+
+function renderExample(example) {
+  document.getElementById('example-title').textContent = example.title;
+  document.getElementById('example-subtitle').textContent = example.subtitle;
+  document.getElementById('example-table').innerHTML = example.rows.map(row => {
+    const classes = ['example-row'];
+    if (row.section) classes.push('section');
+    if (row.indent) classes.push('indent');
+    if (row.total) classes.push('total');
+    return `<div class="${classes.join(' ')}"><span class="example-label">${row.label}</span><span class="example-amount">${row.amount}</span></div>`;
+  }).join('');
+  document.getElementById('example-note').textContent = example.note;
+}
 
 function applyStage(idx) {
   const s = stages[idx];
@@ -474,6 +642,7 @@ function applyStage(idx) {
   // Narration
   document.getElementById('stage-label').textContent = s.stageLabel;
   document.getElementById('narration').innerHTML = s.narration;
+  renderExample(s.example);
 
   // Button
   const btn = document.getElementById('btn-next');
