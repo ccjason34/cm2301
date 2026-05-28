@@ -86,24 +86,82 @@
 
   .equation-strip {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
+    gap: 10px;
+    padding: 14px;
     background: var(--panel);
-    border: 1px solid var(--line);
+    border: 2px solid rgba(21, 122, 110, 0.22);
     border-radius: 8px;
     box-shadow: var(--shadow);
   }
 
+  .eq-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .eq-title {
+    color: var(--ink);
+    font-size: 0.9rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .eq-balance-pill {
+    border-radius: 999px;
+    background: rgba(19, 121, 91, 0.1);
+    border: 1px solid rgba(19, 121, 91, 0.26);
+    color: var(--good);
+    padding: 6px 10px;
+    font-size: 0.76rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .eq-formula {
+    display: grid;
+    grid-template-columns: minmax(170px, 1fr) auto minmax(0, 1.65fr);
+    gap: 10px;
+    align-items: stretch;
+  }
+
   .eq-side {
     display: grid;
-    gap: 3px;
+    align-content: center;
+    gap: 6px;
+    min-width: 0;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    padding: 12px;
+    min-height: 96px;
+    background: #f9fbfd;
+  }
+
+  .eq-side.assets-box {
+    border-color: rgba(21, 122, 110, 0.28);
+    background: linear-gradient(180deg, #f1fbf7, #ffffff);
+  }
+
+  .eq-claims {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 8px;
+    align-items: stretch;
     min-width: 0;
   }
 
-  .eq-side.right {
-    text-align: right;
+  .eq-side.liability-box {
+    border-color: rgba(200, 76, 49, 0.28);
+    background: linear-gradient(180deg, #fff5f2, #ffffff);
+  }
+
+  .eq-side.equity-box {
+    border-color: rgba(122, 90, 248, 0.28);
+    background: linear-gradient(180deg, #f7f4ff, #ffffff);
   }
 
   .eq-label {
@@ -133,30 +191,32 @@
     color: var(--asset);
   }
 
-  #eqClaims {
+  #eqLiabilities {
     color: var(--liability);
   }
 
-  .eq-breakdown {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 3px;
+  #eqEquity {
+    color: var(--capital);
   }
 
-  .eq-breakdown span {
-    max-width: 100%;
-    overflow-wrap: anywhere;
+  #eqAssetsTotal {
+    color: var(--asset);
   }
 
-  .eq-total {
+  #eqClaimsTotal {
     color: var(--ink);
-    font-size: 0.82em;
+  }
+
+  .eq-note {
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+    line-height: 1.3;
   }
 
   .eq-symbol {
-    width: 48px;
-    height: 48px;
+    width: 52px;
+    min-height: 96px;
     border-radius: 50%;
     display: grid;
     place-items: center;
@@ -164,6 +224,48 @@
     color: white;
     font-size: 1.5rem;
     font-weight: 900;
+  }
+
+  .eq-plus {
+    display: grid;
+    place-items: center;
+    color: var(--ink);
+    font-size: 1.6rem;
+    font-weight: 900;
+    padding: 0 2px;
+  }
+
+  .eq-total-row {
+    display: grid;
+    grid-template-columns: minmax(170px, 1fr) auto minmax(0, 1.65fr);
+    align-items: stretch;
+    gap: 10px;
+    padding-top: 2px;
+  }
+
+  .eq-total-card {
+    display: grid;
+    gap: 5px;
+    min-width: 0;
+    border-radius: 8px;
+    border: 2px solid rgba(23, 32, 42, 0.14);
+    background: #f7f9fc;
+    padding: 10px 12px;
+  }
+
+  .eq-total-card.claims-total {
+    grid-column: 3;
+    border-color: rgba(23, 32, 42, 0.2);
+  }
+
+  .eq-total-card.assets-total {
+    grid-column: 1;
+    border-color: rgba(21, 122, 110, 0.28);
+    background: #f2fbf7;
+  }
+
+  .eq-total-spacer {
+    width: 52px;
   }
 
   .tab-bar {
@@ -955,21 +1057,37 @@
       grid-template-rows: auto;
     }
 
-    .equation-strip {
+    .eq-formula {
       grid-template-columns: 1fr;
       text-align: center;
     }
 
-    .eq-side.right {
+    .eq-total-row {
+      grid-template-columns: 1fr;
       text-align: center;
     }
 
-    .eq-breakdown {
-      align-items: center;
+    .eq-total-card.assets-total,
+    .eq-total-card.claims-total {
+      grid-column: auto;
+    }
+
+    .eq-total-spacer {
+      display: none;
+    }
+
+    .eq-claims {
+      grid-template-columns: 1fr;
     }
 
     .eq-symbol {
       margin: 0 auto;
+      width: 52px;
+      min-height: 52px;
+    }
+
+    .eq-plus {
+      min-height: 30px;
     }
 
     .cart-scene {
@@ -1038,16 +1156,42 @@
     </div>
 
     <section class="equation-strip" aria-label="Accounting equation">
-      <div class="eq-side">
-        <div class="eq-label">Assets</div>
-        <div class="eq-value" id="eqAssets">$0</div>
+      <div class="eq-top">
+        <div class="eq-title">Accounting Equation</div>
+        <div class="eq-balance-pill" id="eqBalancePill">Balanced</div>
       </div>
-      <div class="eq-symbol">=</div>
-      <div class="eq-side right">
-        <div class="eq-label">Liabilities + Equity</div>
-        <div class="eq-value eq-breakdown" id="eqClaims">
-          <span>$0 + $0</span>
-          <span class="eq-total">= $0</span>
+      <div class="eq-formula">
+        <div class="eq-side assets-box">
+          <div class="eq-label">Assets</div>
+          <div class="eq-value" id="eqAssets">$0</div>
+          <div class="eq-note">What the business owns</div>
+        </div>
+        <div class="eq-symbol">=</div>
+        <div class="eq-claims">
+          <div class="eq-side liability-box">
+            <div class="eq-label">Liabilities</div>
+            <div class="eq-value" id="eqLiabilities">$0</div>
+            <div class="eq-note">Owed to others</div>
+          </div>
+          <div class="eq-plus">+</div>
+          <div class="eq-side equity-box">
+            <div class="eq-label">Equity</div>
+            <div class="eq-value" id="eqEquity">$0</div>
+            <div class="eq-note">Owner's claim</div>
+          </div>
+        </div>
+      </div>
+      <div class="eq-total-row" aria-label="Equation totals">
+        <div class="eq-total-card assets-total">
+          <div class="eq-label">Assets Total</div>
+          <div class="eq-value" id="eqAssetsTotal">$0</div>
+          <div class="eq-note">Must equal claims total</div>
+        </div>
+        <div class="eq-total-spacer" aria-hidden="true"></div>
+        <div class="eq-total-card claims-total">
+          <div class="eq-label">Total Liabilities and Equity</div>
+          <div class="eq-value" id="eqClaimsTotal">$0</div>
+          <div class="eq-note">Liabilities + Equity</div>
         </div>
       </div>
     </section>
@@ -1141,8 +1285,8 @@
         </div>
 
         <div class="stack-column">
-          <div class="stack-heading">Claims: Liabilities + Equity</div>
-          <div class="stack" aria-label="Claims stack">
+          <div class="stack-heading">Liabilities + Equity</div>
+          <div class="stack" aria-label="Liabilities and equity stack">
             <div class="block loan-block" id="loanBlock">
               <div class="block-name">Loan payable</div>
               <div class="block-amount" id="loanBlockAmount">$0</div>
@@ -1348,7 +1492,6 @@
     animationPane: document.getElementById("animationPane"),
     quizPane: document.getElementById("quizPane"),
     eqAssets: document.getElementById("eqAssets"),
-    eqClaims: document.getElementById("eqClaims"),
     stepCount: document.getElementById("stepCount"),
     stepTitle: document.getElementById("stepTitle"),
     stepStory: document.getElementById("stepStory"),
@@ -1367,7 +1510,12 @@
     resetBtn: document.getElementById("resetBtn"),
     checkBtn: document.getElementById("checkBtn"),
     retryBtn: document.getElementById("retryBtn"),
-    scoreBox: document.getElementById("scoreBox")
+    scoreBox: document.getElementById("scoreBox"),
+    eqLiabilities: document.getElementById("eqLiabilities"),
+    eqEquity: document.getElementById("eqEquity"),
+    eqAssetsTotal: document.getElementById("eqAssetsTotal"),
+    eqClaimsTotal: document.getElementById("eqClaimsTotal"),
+    eqBalancePill: document.getElementById("eqBalancePill")
   };
 
   const blocks = {
@@ -1477,9 +1625,15 @@
     const profit = step.revenue - step.expenses;
 
     el.eqAssets.textContent = money(assets);
-    el.eqClaims.innerHTML = "<span>" + money(step.liabilities) + " + " + money(equity) + "</span><span class=\"eq-total\">= " + money(claims) + "</span>";
+    el.eqLiabilities.textContent = money(step.liabilities);
+    el.eqEquity.textContent = money(equity);
+    el.eqAssetsTotal.textContent = money(assets);
+    el.eqClaimsTotal.textContent = money(claims);
     bump(el.eqAssets);
-    bump(el.eqClaims);
+    bump(el.eqLiabilities);
+    bump(el.eqEquity);
+    bump(el.eqAssetsTotal);
+    bump(el.eqClaimsTotal);
 
     el.stepCount.textContent = index === 0 ? "Before launch" : "Transaction " + index + " of 6";
     el.stepTitle.textContent = step.title;
@@ -1491,6 +1645,7 @@
     el.assetTotal.textContent = money(assets);
     el.claimTotal.textContent = money(claims);
     el.balancedBadge.textContent = assets === claims ? "Balanced" : "Needs review";
+    el.eqBalancePill.textContent = assets === claims ? "Balanced" : "Needs review";
 
     setBlock("cash", step.cash, step.changed);
     setBlock("equipment", step.equipment, step.changed);
